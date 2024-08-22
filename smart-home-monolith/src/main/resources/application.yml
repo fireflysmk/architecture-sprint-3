@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://smart-home-monolith-postgresql.default:5432/smart_home
-    username: your_username
-    password: your_password
+    username: postgres
+    password: postgres
     hikari:
       allow-pool-suspension: true
   jpa:
@@ -14,10 +14,15 @@ spring:
       hibernate:
         boot.allow_jdbc_metadata_access: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:init.sql
+  
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    enabled: true
+  
+#  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:init.sql
 
 server:
   port: 8080

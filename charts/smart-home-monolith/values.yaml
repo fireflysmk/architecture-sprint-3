@@ -5,12 +5,20 @@
 replicaCount: 1
 
 image:
-  repository: ghcr.io/yandex-practicum/architecture-sprint-3
+  repository: ghcr.io/synaxintelligence/srv-mono
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: latest
 
-imagePullSecrets: 
+environment:
+  DB_HOST: "smart-home-monolith-postgresql.default"
+  DB_PORT: "5432"
+  DB_NAME: "smart_home"
+  DB_USER: "postgres"
+  DB_PASSWORD: "postgres"
+  SPRING_PROFILES_ACTIVE: "cluster"
+
+imagePullSecrets:
   - name: ghcr
 
 nameOverride: ""
@@ -31,7 +39,7 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 securityContext: {}
   # capabilities:
@@ -39,7 +47,7 @@ securityContext: {}
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
+# runAsUser: 1000
 
 service:
   type: ClusterIP
@@ -50,7 +58,7 @@ ingress:
   className: ""
   annotations: {}
     # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
       paths:
@@ -71,7 +79,7 @@ resources: {}
   #   memory: 128Mi
   # requests:
   #   cpu: 100m
-  #   memory: 128Mi
+#   memory: 128Mi
 
 
 autoscaling:
@@ -104,6 +112,6 @@ affinity: {}
 postgresql:
   enabled: true
   auth:
-    username: your_username
-    password: your_password
+    username: postgres
+    password: postgres
     database: smart_home

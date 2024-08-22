@@ -1,0 +1,9 @@
+﻿spring:
+  config:
+    activate:
+      on-profile: cluster
+  datasource:
+    url: jdbc:postgresql://smart-home-monolith-postgresql.default:5432/postgres
+    username: postgres
+    password: postgres
+      
