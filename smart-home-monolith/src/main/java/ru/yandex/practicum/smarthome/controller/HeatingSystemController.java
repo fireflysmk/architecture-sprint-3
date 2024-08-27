@@ -44,6 +44,7 @@ public class HeatingSystemController {
         return ResponseEntity.noContent().build();
     }
 
+
     @PostMapping("/{id}/turn-off")
     public ResponseEntity<Void> turnOff(@PathVariable("id") Long id) {
         logger.info("Turning off heating system with id {}", id);
