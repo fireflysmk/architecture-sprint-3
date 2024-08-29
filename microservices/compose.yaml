@@ -1,0 +1,62 @@
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=device_db'
+      - 'POSTGRES_PASSWORD=postgres'
+      - 'POSTGRES_USER=postgres'
+    ports:
+      - '5432:5432'
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: telemetry
+
+  telemetry-service:
+    image: telemetry-service
+    depends_on:
+      - mongo
+    ports:
+      - '8081:8081'
+
+  device-service:
+    image: device-service
+    depends_on:
+      - postgres
+    ports:
+      - '8080:8080'
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/device_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9093
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - "9092:9092"  # Пробрасываем порт на хост
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENER_NAME: INSIDE
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8085:8080
+    environment:
+      DYNAMIC_CONFIG_ENABLED: true

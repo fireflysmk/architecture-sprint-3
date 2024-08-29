@@ -1,0 +1,62 @@
+openapi: 3.0.3
+info:
+  title: Sensor API
+  description: API для получения данных от датчиков и их обработки.
+  version: 1.0.0
+
+paths:
+  /sensors/data:
+    post:
+      summary: Прием данных от датчиков
+      description: Принимает данные от датчиков и передает их в Kafka для дальнейшей обработки.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_id:
+                  type: string
+                  format: uuid
+                  description: Уникальный идентификатор устройства, отправляющего данные
+                timestamp:
+                  type: string
+                  format: date-time
+                  description: Дата и время получения данных от датчика
+                data:
+                  type: object
+                  additionalProperties: true
+                  description: Данные, полученные от датчика
+              required:
+                - device_id
+                - timestamp
+                - data
+      responses:
+        '200':
+          description: Данные успешно получены и переданы на обработку
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Ошибка сервера
+
+components:
+  schemas:
+    SensorData:
+      type: object
+      properties:
+        device_id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор устройства, отправляющего данные
+        timestamp:
+          type: string
+          format: date-time
+          description: Дата и время получения данных от датчика
+        data:
+          type: object
+          additionalProperties: true
+          description: Данные, полученные от датчика
+      required:
+        - device_id
+        - timestamp
+        - data

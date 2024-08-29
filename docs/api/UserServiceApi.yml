@@ -1,0 +1,179 @@
+openapi: 3.0.3
+info:
+  title: User Service API
+  description: API для управления пользователями, их учетными записями и аутентификацией.
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/users
+    description: Основной сервер API
+paths:
+  /users/{user_id}:
+    get:
+      summary: Получение информации о пользователе
+      description: Возвращает подробную информацию о пользователе по его ID.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор пользователя
+      responses:
+        '200':
+          description: Информация о пользователе возвращена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: Уникальный идентификатор пользователя
+                  username:
+                    type: string
+                    description: Имя пользователя
+                  email:
+                    type: string
+                    description: Электронная почта пользователя
+                required:
+                  - id
+                  - username
+                  - email
+        '404':
+          description: Пользователь не найден
+        '500':
+          description: Ошибка сервера
+
+    put:
+      summary: Обновление информации о пользователе
+      description: Обновляет информацию о пользователе по его ID.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор пользователя
+      requestBody:
+        description: Данные для обновления пользователя
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Новое имя пользователя
+                email:
+                  type: string
+                  description: Новая электронная почта пользователя
+              required:
+                - username
+                - email
+      responses:
+        '200':
+          description: Информация о пользователе успешно обновлена
+        '400':
+          description: Некорректный запрос
+        '404':
+          description: Пользователь не найден
+        '500':
+          description: Ошибка сервера
+
+  /users:
+    post:
+      summary: Регистрация нового пользователя
+      description: Создает новый аккаунт пользователя.
+      requestBody:
+        description: Данные для регистрации нового пользователя
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Имя пользователя
+                password:
+                  type: string
+                  description: Пароль пользователя
+                email:
+                  type: string
+                  description: Электронная почта пользователя
+              required:
+                - username
+                - password
+                - email
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+        '400':
+          description: Некорректный запрос
+        '500':
+          description: Ошибка сервера
+
+  /users/{user_id}/auth:
+    post:
+      summary: Аутентификация пользователя
+      description: Выполняет аутентификацию пользователя по его учетным данным.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор пользователя
+      requestBody:
+        description: Данные для аутентификации
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: Пароль пользователя
+              required:
+                - password
+      responses:
+        '200':
+          description: Успешная аутентификация
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Токен для дальнейших запросов
+        '401':
+          description: Неверные учетные данные
+        '500':
+          description: Ошибка сервера
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор пользователя
+        username:
+          type: string
+          description: Имя пользователя
+        email:
+          type: string
+          description: Электронная почта пользователя
+      required:
+        - id
+        - username
+        - email

@@ -1,0 +1,28 @@
+@startuml
+!include <C4/C4_Component>
+
+Container_Boundary(deviceServiceContainer, "Device Service") {
+
+    Component(deviceController, "Device Controller", "Spring Boot Controller", "Обрабатывает запросы на управление устройствами и конфигурации.")
+    Component(deviceManager, "Device Manager", "Spring Boot Service", "Управляет бизнес-логикой для устройств, включая их состояние и конфигурацию.")
+    Component(deviceRepository, "Device Repository", "Spring Data JPA", "Хранит и управляет данными об устройствах.")
+    Component(kafkaConsumer, "Kafka Consumer", "Spring Kafka", "Читает данные из топиков Kafka.")
+    Component(telemetryClient, "Telemetry Client", "Rest Client", "Отправляет данные в Telemetry Service.")
+
+    Rel(deviceController, deviceManager, "Направляет команды и запросы на управление")
+    Rel(deviceManager, deviceRepository, "Получает и сохраняет данные об устройствах")
+    Rel(kafkaConsumer, deviceManager, "Передает данные из Kafka в Device Manager")
+    Rel(deviceManager, telemetryClient, "Отправляет данные в Telemetry Service")
+
+}
+
+Container_Ext(apiGateway, "API Gateway", "Spring Boot", "Центральная точка входа для всех запросов от внешних систем.")
+Container_Ext(kafkaBroker, "Kafka Broker", "Apache Kafka", "Обрабатывает сообщения и управляет топиками.")
+Container_Ext(telemetryService, "Telemetry Service", "Spring Boot", "Обрабатывает и сохраняет телеметрические данные.")
+
+Rel(apiGateway, deviceController, "Запросы на управление устройствами и конфигурации")
+Rel(deviceManager, kafkaBroker, "Читает данные из топиков")
+Rel(telemetryClient, telemetryService, "Передает телеметрические данные")
+
+SHOW_LEGEND()
+@enduml

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: telemetry-service
+spec:
+  selector:
+    matchLabels:
+      app: telemetry-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: telemetry-service
+    spec:
+      containers:
+        - name: telemetry-service
+          image: {{ .Values.telemetryService.image }}
+          ports:
+            - containerPort: {{ .Values.telemetryService.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: telemetry-service
+spec:
+  ports:
+    - port: {{ .Values.telemetryService.port }}
+  selector:
+    app: telemetry-service

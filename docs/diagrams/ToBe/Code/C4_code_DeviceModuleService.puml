@@ -1,0 +1,61 @@
+@startuml
+!include <C4/C4_Component>
+
+package "Device Service" {
+    class Device {
+        +UUID id
+        +String name
+        +String type
+        +JSON configuration
+        +addCommand(Command)
+        +removeCommand(Command)
+        +applyCommand(Command)
+        +requestCommand()
+        +getTelemetryData()
+    }
+
+    class Command {
+        +UUID id
+        +String type
+        +JSON parameters
+        +Device device
+    }
+
+    class DeviceGroup {
+        +UUID id
+        +String name
+        +List<Device> devices
+        +applyCommandToAll(Command)
+    }
+
+    class DeviceRepository {
+        +save(Device)
+        +findById(UUID)
+        +findAll()
+    }
+
+    class KafkaConsumer {
+        +consumeMessage(String topic)
+        +processTelemetryData(TelemetryData)
+    }
+
+    class TelemetryClient {
+        +sendTelemetryData(TelemetryData)
+    }
+
+    class TelemetryData {
+        +UUID id
+        +Timestamp timestamp
+        +UUID deviceId
+        +JSON data
+    }
+
+    Device --> Command : "sends"
+    Device --> TelemetryData
+    DeviceGroup --> Device : "contains"
+    DeviceGroup --> Command : "applies command to all"
+    DeviceRepository --> Device : "manages"
+    KafkaConsumer --> TelemetryData : "processes"
+    TelemetryClient --> TelemetryData : "sends"
+}
+@enduml

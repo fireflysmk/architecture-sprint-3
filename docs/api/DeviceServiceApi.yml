@@ -1,0 +1,348 @@
+openapi: 3.0.3
+info:
+  title: Device Management API
+  description: API для управления устройствами, их конфигурациями и телеметрией.
+  version: 1.0.0
+
+paths:
+  /devices:
+    post:
+      summary: Добавить новое устройство
+      description: Создает новое устройство и сохраняет его в базе данных.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  format: uuid
+                  description: Уникальный идентификатор пользователя, которому принадлежит устройство
+                name:
+                  type: string
+                  example: "Thermostat"
+                type:
+                  type: string
+                  example: "temperature"
+                serial_number:
+                  type: string
+                  example: "ABC123456"
+                model_name:
+                  type: string
+                  example: "SmartThermo X1"
+                manufacturer:
+                  type: string
+                  example: "SmartTech"
+              required:
+                - user_id
+                - name
+                - type
+                - serial_number
+                - model_name
+                - manufacturer
+      responses:
+        '201':
+          description: Устройство успешно добавлено
+        '400':
+          description: Неверный запрос
+
+  /devices/{device_id}:
+    get:
+      summary: Получить информацию об устройстве
+      description: Возвращает подробную информацию об устройстве по его ID.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+      responses:
+        '200':
+          description: Информация об устройстве
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: Уникальный идентификатор пользователя, которому принадлежит устройство
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  serial_number:
+                    type: string
+                  model_name:
+                    type: string
+                  manufacturer:
+                    type: string
+                  configuration:
+                    type: object
+                    additionalProperties: true
+                required:
+                  - id
+                  - user_id
+                  - name
+                  - type
+                  - serial_number
+                  - model_name
+                  - manufacturer
+        '404':
+          description: Устройство не найдено
+
+    delete:
+      summary: Удалить устройство
+      description: Удаляет устройство по его ID.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+      responses:
+        '204':
+          description: Устройство успешно удалено
+        '404':
+          description: Устройство не найдено
+
+  /devices/{device_id}/configuration:
+    put:
+      summary: Обновить конфигурацию устройства
+      description: Обновляет конфигурацию устройства через команду.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: "update"
+                parameters:
+                  type: object
+                  additionalProperties: true
+                deviceId:
+                  type: string
+                  format: uuid
+                user_id:
+                  type: string
+                  format: uuid
+                  description: Уникальный идентификатор пользователя, которому принадлежит устройство
+              required:
+                - type
+                - parameters
+                - deviceId
+                - user_id
+      responses:
+        '200':
+          description: Конфигурация успешно обновлена
+        '404':
+          description: Устройство не найдено
+        '400':
+          description: Неверный запрос
+
+  /devices/{device_id}/configuration:
+    get:
+      summary: Получить конфигурацию устройства
+      description: Возвращает текущую конфигурацию устройства.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+      responses:
+        '200':
+          description: Конфигурация устройства возвращена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  parameters:
+                    type: object
+                    additionalProperties: true
+                  deviceId:
+                    type: string
+                    format: uuid
+                  user_id:
+                    type: string
+                    format: uuid
+                    description: Уникальный идентификатор пользователя, которому принадлежит устройство
+                required:
+                  - type
+                  - parameters
+                  - deviceId
+                  - user_id
+        '404':
+          description: Устройство не найдено
+
+  /devices/{device_id}/telemetry/latest:
+    get:
+      summary: Получение последних данных телеметрии
+      description: Возвращает последнее полученное значение телеметрии для устройства.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+      responses:
+        '200':
+          description: Последние данные телеметрии возвращены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: Дата и время получения данных
+                  data:
+                    type: object
+                    additionalProperties: true
+                    description: Данные телеметрии
+                required:
+                  - timestamp
+                  - data
+        '404':
+          description: Устройство не найдено
+        '500':
+          description: Ошибка сервера
+
+  /devices/{device_id}/telemetry/history:
+    get:
+      summary: Получение исторических данных телеметрии
+      description: Возвращает исторические данные телеметрии для устройства за определённый период времени.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+        - name: start_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Дата и время начала периода
+        - name: end_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Дата и время конца периода
+      responses:
+        '200':
+          description: Исторические данные возвращены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: Дата и время получения данных
+                        data:
+                          type: object
+                          additionalProperties: true
+                          description: Данные телеметрии
+                      required:
+                        - timestamp
+                        - data
+                required:
+                  - data
+        '404':
+          description: Устройство не найдено
+        '500':
+          description: Ошибка сервера
+
+  /users/{user_id}/devices:
+    get:
+      summary: Получить все устройства пользователя
+      description: Возвращает все устройства, принадлежащие указанному пользователю.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор пользователя
+      responses:
+        '200':
+          description: Устройства пользователя возвращены
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    user_id:
+                      type: string
+                      format: uuid
+                      description: Уникальный идентификатор пользователя, которому принадлежит устройство
+                    name:
+                      type: string
+                    type:
+                      type: string
+                    serial_number:
+                      type: string
+                    model_name:
+                      type: string
+                    manufacturer:
+                      type: string
+                    configuration:
+                      type: object
+                      additionalProperties: true
+                  required:
+                    - id
+                    - user_id
+                    - name
+                    - type
+                    - serial_number
+                    - model_name
+                    - manufacturer
+        '404':
+          description: Пользователь не найден
+        '500':
+          description: Ошибка сервера

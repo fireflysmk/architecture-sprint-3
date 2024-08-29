@@ -1,0 +1,47 @@
+
+spring:
+  application:
+    name: device-service
+  datasource:
+    url: jdbc:postgresql://postgres:5432/device_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: telemetry-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      acks: all
+      retries: 3
+kafka:
+  topic:
+    telemetry: telemetry-data-topic
+
+telemetry:
+  service:
+    url: http://telemetry-service:8081/telemetry-service
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type: INFO
+
+server:
+  port: 8080
+  servlet:
+    context-path: /device-service

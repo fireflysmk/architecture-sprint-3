@@ -1,0 +1,243 @@
+openapi: 3.0.3
+info:
+  title: House Service API
+  description: API для управления данными о домах и устройствах.
+  version: 1.0.0
+servers:
+  - url: https://localhost:8080/houses
+    description: Основной сервер API
+paths:
+  /houses/{house_id}:
+    get:
+      summary: Получение информации о доме
+      description: Возвращает подробную информацию о доме по его ID.
+      parameters:
+        - name: house_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор дома
+      responses:
+        '200':
+          description: Информация о доме возвращена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: Уникальный идентификатор дома
+                  address:
+                    type: string
+                    description: Адрес дома
+                  owner_id:
+                    type: string
+                    format: uuid
+                    description: Идентификатор владельца дома
+                  devices:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+                    description: Список идентификаторов устройств, связанных с домом
+                required:
+                  - id
+                  - address
+                  - owner_id
+        '404':
+          description: Дом не найден
+        '500':
+          description: Ошибка сервера
+
+    put:
+      summary: Обновление информации о доме
+      description: Обновляет информацию о доме по его ID.
+      parameters:
+        - name: house_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор дома
+      requestBody:
+        description: Данные для обновления информации о доме
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: string
+                  description: Новый адрес дома
+                owner_id:
+                  type: string
+                  format: uuid
+                  description: Новый идентификатор владельца
+                devices:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: Обновленный список устройств, связанных с домом
+              required:
+                - address
+                - owner_id
+      responses:
+        '200':
+          description: Информация о доме успешно обновлена
+        '400':
+          description: Некорректный запрос
+        '404':
+          description: Дом не найден
+        '500':
+          description: Ошибка сервера
+
+  /houses:
+    post:
+      summary: Создание нового дома
+      description: Создает новый дом с указанными данными.
+      requestBody:
+        description: Данные для создания нового дома
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: string
+                  description: Адрес дома
+                owner_id:
+                  type: string
+                  format: uuid
+                  description: Идентификатор владельца дома
+                devices:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                  description: Список идентификаторов устройств, связанных с домом
+              required:
+                - address
+                - owner_id
+      responses:
+        '201':
+          description: Новый дом успешно создан
+        '400':
+          description: Некорректный запрос
+        '500':
+          description: Ошибка сервера
+
+  /houses/{house_id}/devices:
+    get:
+      summary: Получение списка устройств в доме
+      description: Возвращает список идентификаторов устройств, связанных с домом.
+      parameters:
+        - name: house_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор дома
+      responses:
+        '200':
+          description: Список устройств возвращен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+                description: Список идентификаторов устройств
+        '404':
+          description: Дом не найден
+        '500':
+          description: Ошибка сервера
+
+  /houses/{house_id}/devices/{device_id}:
+    put:
+      summary: Добавление устройства в дом
+      description: Добавляет устройство в дом.
+      parameters:
+        - name: house_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор дома
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+      responses:
+        '200':
+          description: Устройство успешно добавлено
+        '404':
+          description: Дом или устройство не найдены
+        '500':
+          description: Ошибка сервера
+
+    delete:
+      summary: Удаление устройства из дома
+      description: Удаляет устройство из дома.
+      parameters:
+        - name: house_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор дома
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+      responses:
+        '200':
+          description: Устройство успешно удалено
+        '404':
+          description: Дом или устройство не найдены
+        '500':
+          description: Ошибка сервера
+
+components:
+  schemas:
+    House:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Уникальный идентификатор дома
+        address:
+          type: string
+          description: Адрес дома
+        owner_id:
+          type: string
+          format: uuid
+          description: Идентификатор владельца дома
+        devices:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Список идентификаторов устройств, связанных с домом
+      required:
+        - id
+        - address
+        - owner_id

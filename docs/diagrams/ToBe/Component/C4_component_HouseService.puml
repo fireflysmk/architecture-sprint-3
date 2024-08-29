@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4_Component>
+
+Container_Boundary(houseServiceContainer, "House Service") {
+
+    Component(houseController, "House Controller", "Spring Boot Controller", "Обрабатывает запросы на управление данными о домах и устройствах.")
+    Component(houseService, "House Service", "Spring Boot Service", "Управляет бизнес-логикой для данных о домах, связанных с устройствами и пользователями.")
+    Component(houseRepository, "House Repository", "Spring Data JPA", "Хранит и управляет данными о домах.")
+    Component(deviceRepository, "Device Repository", "Spring Data JPA", "Хранит и управляет данными об устройствах.")
+
+    Rel(houseController, houseService, "Направляет запросы на управление данными о домах")
+    Rel(houseService, houseRepository, "Получает и сохраняет данные о домах")
+    Rel(houseService, deviceRepository, "Получает и сохраняет данные об устройствах")
+
+}
+
+Container_Ext(apiGateway, "API Gateway", "Spring Boot", "Центральная точка входа для всех запросов от внешних систем.")
+Container_Ext(deviceService, "Device Service", "Spring Boot", "Управляет устройствами и обрабатывает данные из Kafka.")
+Container_Ext(userService, "User Service", "Spring Boot", "Управляет данными пользователей и их учетными записями.")
+
+Rel(apiGateway, houseController, "Запросы на управление данными о домах и устройствах")
+Rel(houseService, deviceService, "Взаимодействует для получения данных об устройствах через Api gateway")
+Rel(houseService, userService, "Взаимодействует для получения данных о пользователях через Api gateway")
+
+SHOW_LEGEND()
+@enduml

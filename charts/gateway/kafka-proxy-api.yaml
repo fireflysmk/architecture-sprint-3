@@ -1,0 +1,334 @@
+openapi: 3.0.0
+info:
+  title: kafka-proxy-api
+  version: 0.1.0
+
+x-kusk:
+  upstream:
+    service:
+      name: kafka-rest-proxy
+      namespace: default
+      port: 8099
+
+paths:
+  /v3/clusters/{cluster_id}/topics/{topic_name}/records:
+    post:
+      summary: Send message to Kafka topic
+      operationId: sendMessageToKafka
+      parameters:
+        - name: cluster_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: topic_name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Message to send to Kafka
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      example: JSON
+                    data:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: testUser
+                  required:
+                    - type
+                    - data
+              required:
+                - value
+      responses:
+        '200':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error_code:
+                    type: integer
+                    example: 200
+                  cluster_id:
+                    type: string
+                  topic_name:
+                    type: string
+                  partition_id:
+                    type: integer
+                  offset:
+                    type: integer
+                  timestamp:
+                    type: string
+                    format: date-time
+                  value:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      size:
+                        type: integer
+        '400':
+          description: Invalid request
+
+  /v3/clusters/{cluster_id}/topics:
+    get:
+      summary: List Kafka topics
+      operationId: listKafkaTopics
+      parameters:
+        - name: cluster_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of Kafka topics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kind:
+                    type: string
+                    example: KafkaTopicList
+                  metadata:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics
+                      next:
+                        type: string
+                        nullable: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        kind:
+                          type: string
+                          example: KafkaTopic
+                        metadata:
+                          type: object
+                          properties:
+                            self:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/jsontest
+                            resource_name:
+                              type: string
+                              example: crn:///kafka=xFhUvurESIeeCI87SXWR-Q/topic=jsontest
+                        cluster_id:
+                          type: string
+                          example: xFhUvurESIeeCI87SXWR-Q
+                        topic_name:
+                          type: string
+                          example: jsontest
+                        is_internal:
+                          type: boolean
+                          example: false
+                        replication_factor:
+                          type: integer
+                          example: 1
+                        partitions_count:
+                          type: integer
+                          example: 1
+                        partitions:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/jsontest/partitions
+                        configs:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/jsontest/configs
+                        partition_reassignments:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/jsontest/partitions/-/reassignment
+        '400':
+          description: Invalid request
+
+    post:
+      summary: Create a new Kafka topic
+      operationId: createKafkaTopic
+      parameters:
+        - name: cluster_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Topic to create in Kafka
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topic_name:
+                  type: string
+                  example: jsontest
+              required:
+                - topic_name
+      responses:
+        '200':
+          description: Topic created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kind:
+                    type: string
+                    example: KafkaTopic
+                  metadata:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/jsontest
+                      resource_name:
+                        type: string
+                        example: crn:///kafka=xFhUvurESIeeCI87SXWR-Q/topic=jsontest
+                  cluster_id:
+                    type: string
+                    example: xFhUvurESIeeCI87SXWR-Q
+                  topic_name:
+                    type: string
+                    example: jsontest
+                  is_internal:
+                    type: boolean
+                    example: false
+                  replication_factor:
+                    type: integer
+                    example: 1
+                  partitions_count:
+                    type: integer
+                    example: 1
+                  partitions:
+                    type: object
+                    properties:
+                      related:
+                        type: string
+                        example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/jsontest/partitions
+                  configs:
+                    type: object
+                    properties:
+                      related:
+                        type: string
+                        example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/jsontest/configs
+                  partition_reassignments:
+                    type: object
+                    properties:
+                      related:
+                        type: string
+                        example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/jsontest/partitions/-/reassignment
+        '400':
+          description: Invalid request
+
+  /v3/clusters:
+    get:
+      summary: List Kafka clusters
+      operationId: listKafkaClusters
+      responses:
+        '200':
+          description: List of Kafka clusters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  kind:
+                    type: string
+                    example: KafkaClusterList
+                  metadata:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        example: http://localhost:8082/v3/clusters
+                      next:
+                        type: string
+                        nullable: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        kind:
+                          type: string
+                          example: KafkaCluster
+                        metadata:
+                          type: object
+                          properties:
+                            self:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q
+                            resource_name:
+                              type: string
+                              example: crn:///kafka=xFhUvurESIeeCI87SXWR-Q
+                        cluster_id:
+                          type: string
+                          example: xFhUvurESIeeCI87SXWR-Q
+                        controller:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/brokers/0
+                        acls:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/acls
+                        brokers:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/brokers
+                        broker_configs:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/broker-configs
+                        consumer_groups:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/consumer-groups
+                        topics:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics
+                        partition_reassignments:
+                          type: object
+                          properties:
+                            related:
+                              type: string
+                              example: http://localhost:8082/v3/clusters/xFhUvurESIeeCI87SXWR-Q/topics/-/partitions/-/reassignment
+        '400':
+          description: Invalid request

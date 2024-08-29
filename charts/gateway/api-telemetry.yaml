@@ -1,0 +1,99 @@
+openapi: 3.0.0
+info:
+  title: simple-api
+  version: 0.1.0
+
+x-kusk:
+  upstream:
+    service:
+      name: telemetry-service
+      namespace: default
+      port: 8080
+paths:
+  /devices/{device_id}/telemetry/latest:
+    get:
+      summary: Получение последних данных телеметрии
+      description: Возвращает последнее полученное значение телеметрии для устройства.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+      responses:
+        '200':
+          description: Последние данные телеметрии возвращены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: Дата и время получения данных
+                  data:
+                    type: object
+                    additionalProperties: true
+                    description: Данные телеметрии
+                required:
+                  - timestamp
+                  - data
+        '404':
+          description: Устройство не найдено
+        '500':
+          description: Ошибка сервера
+
+  /devices/{device_id}/telemetry/history:
+    get:
+      summary: Получение исторических данных телеметрии
+      description: Возвращает исторические данные телеметрии для устройства за определённый период времени.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Уникальный идентификатор устройства
+        - name: start_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Дата и время начала периода
+        - name: end_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Дата и время конца периода
+      responses:
+        '200':
+          description: Исторические данные возвращены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: Дата и время получения данных
+                        data:
+                          type: object
+                          additionalProperties: true
+                          description: Данные телеметрии
+                      required:
+                        - timestamp
+                        - data
+                required:

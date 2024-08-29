@@ -1,0 +1,23 @@
+@startuml
+!include <C4/C4_Component>
+
+Container_Boundary(apiGatewayContainer, "Kong API Gateway") {
+
+    Component(apiGatewayController, "Kong API Gateway", "", "Принимает и маршрутизирует запросы от внешних систем.")
+    Component(apiGatewayConfig, "API Gateway Configuration", "Kong Configuration", "Конфигурация маршрутизации и плагинов для Kong.")
+
+    Rel(apiGatewayController, apiGatewayConfig, "")
+}
+
+Container_Ext(deviceService, "Device Service", "Spring Boot", "Управляет устройствами.")
+Container_Ext(userService, "User Service", "Spring Boot", "Управляет данными пользователей.")
+Container_Ext(houseService, "House Service", "Spring Boot", "Управляет данными о домах и устройствах.")
+Container_Ext(telemetryService, "Telemetry Service", "Spring Boot", "Обрабатывает и сохраняет телеметрические данные.")
+
+Rel(apiGatewayController, deviceService, "Передает запросы на управление устройствами")
+Rel(apiGatewayController, userService, "Передает запросы на управление пользователями")
+Rel(apiGatewayController, houseService, "Передает запросы на управление домами")
+Rel(apiGatewayController, telemetryService, "Передает запросы на телеметрические данные")
+
+SHOW_LEGEND()
+@enduml

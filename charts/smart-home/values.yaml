@@ -1,0 +1,38 @@
+postgres:
+  image: "postgres:latest"
+  database: "device_db"
+  username: "postgres"
+  password: "postgres"
+  port: 5432
+
+mongo:
+  image: "mongo:latest"
+  database: "telemetry"
+  port: 27017
+
+telemetryService:
+  image: "ghcr.io/foxgooodman/telemetry-service:latest"
+  port: 8081
+
+deviceService:
+  image: "ghcr.io/foxgooodman/device-service:latest"
+  port: 8080
+  datasourceUrl: "jdbc:postgresql://postgres:5432/device_db"
+  datasourceUsername: "postgres"
+  datasourcePassword: "postgres"
+  kafkaBootstrapServers: "kafka:9092"
+
+zookeeper:
+  image: "wurstmeister/zookeeper:latest"
+  port: 2181
+
+kafka:
+  image: "wurstmeister/kafka:latest"
+  port: 9092
+  advertisedListeners: "INSIDE://kafka:9092"
+  listeners: "INSIDE://0.0.0.0:9092"
+  listenerSecurityProtocolMap: "INSIDE:PLAINTEXT"
+  listenerName: "INSIDE"
+  interBrokerListenerName: "INSIDE"
+  zookeeperConnect: "zookeeper:2181"
+

@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+
+Container_Boundary(telemetryServiceContainer, "Telemetry Service") {
+
+    Component(telemetryController, "Telemetry Controller", "Spring Boot Controller", "Принимает и обрабатывает запросы на запись и получение телеметрических данных.")
+    Component(telemetryService, "Telemetry Service", "Spring Boot Service", "Обрабатывает логику для сохранения и анализа телеметрических данных.")
+    Component(telemetryRepository, "Telemetry Repository", "Spring Data MongoDB", "Хранит телеметрические данные в базе данных.")
+
+    Rel(telemetryService, telemetryRepository, "Сохраняет и извлекает данные из базы данных")
+
+}
+
+Container_Ext(deviceService, "Device Service", "Spring Boot", "Передает данные в Telemetry Service.")
+
+Rel(deviceService, telemetryController, "Отправляет данные телеметрии")
+Rel(telemetryController, telemetryService, "Передает данные на обработку")
+
+SHOW_LEGEND()
+@enduml

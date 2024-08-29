@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: device-service
+spec:
+  selector:
+    matchLabels:
+      app: device-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: device-service
+    spec:
+      containers:
+        - name: device-service
+          image: {{ .Values.deviceService.image }}
+          ports:
+            - containerPort: {{ .Values.deviceService.port }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: {{ .Values.deviceService.datasourceUrl }}
+            - name: SPRING_DATASOURCE_USERNAME
+              value: {{ .Values.deviceService.datasourceUsername }}
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: {{ .Values.deviceService.datasourcePassword }}
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.deviceService.kafkaBootstrapServers }}

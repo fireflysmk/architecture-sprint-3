@@ -1,0 +1,25 @@
+@startuml
+!include <C4/C4_Container>
+
+title System container diagram for Smart-home-app
+
+AddRelTag("database", $textColor="orange", $lineColor="orange", $lineStyle = DashedLine())
+AddRelTag("external_flow", $lineStyle = DashedLine()")
+
+Person(user, "Пользователь", $sprite="person", "Владелец системы отопления")
+System_Boundary(c1, Smart-home-app) {
+        Container(client, "Web Client", "JavaScript", "Веб интерфейс для управления и мониторинга системы отопления")
+        Container(server, "Web server", "java spring-boot", "Сервер бизнес логики")
+        ContainerDb(database, "Database", "Postgresql", "База данных")
+}
+
+System_Ext(sensor, "sensor", "Датчик температуры/управления системой отопления")
+
+
+Rel(user, client, "Uses", "HTTPS")
+Rel(client, server, "Uses", "HTTPS")
+Rel_L(server, database, "Uses", "TCP/IP", $tags="database")
+Rel_R(server, sensor, "Uses", "HTTPS", $tags="external_flow")
+
+SHOW_LEGEND()
+@enduml

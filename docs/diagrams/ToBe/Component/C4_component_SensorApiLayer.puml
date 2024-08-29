@@ -1,0 +1,19 @@
+@startuml
+!include <C4/C4_Component>
+
+Container_Boundary(sensorApiLayerContainer, "Sensor API Layer") {
+
+    Component(sensorController, "Sensor Controller", "Spring Boot Controller", "Принимает данные от датчиков и управляет запросами на запись данных.")
+    Component(sensorService, "Sensor Service", "Spring Boot Service", "Обрабатывает данные, полученные от датчиков, и направляет их в Kafka.")
+
+}
+
+Container_Ext(kafkaBroker, "Kafka Broker", "Apache Kafka", "Обрабатывает сообщения и управляет топиками.")
+Container_Ext(sensor, "Датчики", "Отправляют данные через Sensor API Layer.")
+
+Rel(sensor, sensorController, "Отправляет данные телеметрии")
+Rel(sensorController, sensorService, "Передает данные на обработку")
+Rel(sensorService, kafkaBroker, "Записывает данные в Kafka топики")
+
+SHOW_LEGEND()
+@enduml

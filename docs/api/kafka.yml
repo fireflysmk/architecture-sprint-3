@@ -1,0 +1,38 @@
+asyncapi: 2.0.0
+info:
+  title: Sensor Topics API
+  description: Спецификация для топиков Kafka, используемых для получения данных от различных типов сенсоров.
+  version: 1.0.0
+
+servers:
+  production:
+    url: kafka-broker:9092
+    protocol: kafka
+
+channels:
+  light-sensor-topic:
+    description: Топик для получения данных от сенсоров
+    subscribe:
+      operationId: telemetry-data-topic
+      summary: Получение данных от сенсоров управления
+      message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            device_id:
+              type: string
+              format: uuid
+              description: Уникальный идентификатор устройства
+            timestamp:
+              type: string
+              format: date-time
+              description: Дата и время получения данных
+            data:
+              type: object
+              additionalProperties: true
+              description: Данные, полученные от сенсора управления
+          required:
+            - device_id
+            - timestamp
+            - data

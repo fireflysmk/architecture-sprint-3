@@ -1,0 +1,16 @@
+@startuml
+!include <C4/C4_Context>
+
+title System Context diagram for Smart-home-app
+
+Person(user, "Пользователь", $sprite="person", "Владелец системы")
+
+System(smart_home, "Smart-home", "Управление и мониторинг систем отопления")
+
+System_Ext(sensor, "sensor", "Модули управления")
+
+Rel(user, smart_home, "Uses", "Управление конфигурацией системы, мониторинг")
+Rel(sensor, smart_home, "Uses", "Запросы конфигураций, отправка телеметрии")
+
+SHOW_LEGEND()
+@enduml

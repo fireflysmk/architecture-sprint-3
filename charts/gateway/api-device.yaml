@@ -1,0 +1,208 @@
+openapi: 3.0.0
+info:
+  title: simple-api
+  version: 0.1.0
+
+x-kusk:
+  upstream:
+    service:
+      name: device-service
+      namespace: default
+      port: 8080
+paths:
+  /device-service/api/v1/devices:
+    post:
+      summary: Add a new device
+      operationId: addDevice
+      requestBody:
+        description: Device information to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceDTO'
+        required: true
+      responses:
+        '201':
+          description: Device created
+        '400':
+          description: Invalid request
+  /device-service/api/v1/devices/{device_id}:
+    get:
+      summary: Get device information
+      operationId: getDeviceInfo
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Device information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDTO'
+        '404':
+          description: Device not found
+    delete:
+      summary: Delete a device
+      operationId: deleteDevice
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Device deleted
+        '404':
+          description: Device not found
+  /device-service/api/v1/devices/{device_id}/configuration:
+    put:
+      summary: Update device configuration
+      operationId: updateDeviceConfiguration
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Device configuration to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceConfigurationDTO'
+        required: true
+      responses:
+        '200':
+          description: Configuration updated
+        '400':
+          description: Invalid request
+        '404':
+          description: Device not found
+    get:
+      summary: Get device configuration
+      operationId: getDeviceConfiguration
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Device configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceConfigurationDTO'
+        '404':
+          description: Device not found
+  /device-service/api/v1/devices/{device_id}/telemetry/latest:
+    get:
+      summary: Get latest telemetry data
+      operationId: getLatestTelemetry
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Latest telemetry data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryDTO'
+        '404':
+          description: Device not found
+  /device-service/api/v1/devices/{device_id}/telemetry/history:
+    get:
+      summary: Get telemetry history
+      operationId: getTelemetryHistory
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: start_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: end_time
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Telemetry history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TelemetryDTO'
+        '404':
+          description: Device not found
+  /device-service/api/v1/users/{user_id}/devices:
+    get:
+      summary: Get devices for a user
+      operationId: getUserDevices
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of devices for the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceDTO'
+        '404':
+          description: User not found
+components:
+  schemas:
+    DeviceDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+    DeviceConfigurationDTO:
+      type: object
+      properties:
+        configuration:
+          type: string
+    TelemetryDTO:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        data:
+          type: string
