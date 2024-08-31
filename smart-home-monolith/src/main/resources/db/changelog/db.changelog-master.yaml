@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changes/00_heating_systems.sql
+  - include:
+      file: db/changelog/changes/00_temperature_sensors.sql

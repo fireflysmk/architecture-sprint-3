@@ -1,0 +1,259 @@
+﻿name: smart-home
+
+services:
+  
+  apisix:
+    image: apache/apisix:latest
+    container_name: apisix
+    restart: always
+    volumes:
+      - ./config/apisix/gateway-config.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - ./config/apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
+    ports:
+      - "9080:9080"
+      - "9443:9443"
+      - "9090:9090"
+    depends_on:
+#      - keycloak
+      - consul
+#      - snx-redis
+    #  - etcd
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.15
+  
+  consul:
+    image: consul:1.15.1
+    container_name: consul
+    restart: always
+    ports:
+      - "8500:8500"
+    command: 'agent -server -bootstrap-expect=1 -ui -node=agent-one -client 0.0.0.0 -log-level info -data-dir=/consul/data -enable-script-checks'
+    volumes:
+      - ./config/consul:/consul/config
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.3
+  
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./volumes/data/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9091:9090"
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.4
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.5
+  
+  postgres:
+    image: timescale/timescaledb:latest-pg12
+    command: postgres -c 'max_connections=250'
+    container_name: postgres
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+        reservations:
+          memory: 256M
+    restart: unless-stopped
+    ports:
+      - "5434:5432"
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./volumes/data/postgres:/var/lib/postgresql/data/
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.6
+  
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:29092,DOCKER://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:29092,DOCKER://kafka:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+    volumes:
+      - ./volumes/data/kafka:/var/lib/kafka/data
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.7
+  
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8200:8080"
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    networks:
+      - smart-network
+  
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/${KEYCLOAK_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KC_HOSTNAME_PORT: ${KEYCLOAK_HOSTNAME_PORT}
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      # KEYCLOAK_IMPORT: ./tmp/realm-export.json # Optional: for importing a preconfigured realm
+    restart: always
+    ports:
+      - "8080:8080"
+      # volumes:
+      # - ./path/to/realm-export.json:/tmp/realm-export.json # Optional: for importing a preconfigured realm
+    depends_on:
+      - postgres
+    networks:
+      - smart-network
+  
+  srv-mono:
+    container_name: srv-mono
+    build:
+      context: smart-home-monolith
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      KAFKA_HOST: ${KAFKA_HOST}
+      KAFKA_PORT: ${KAFKA_PORT}
+      KAFKA_GROUP_ID: ${KAFKA_GROUP_ID}
+      KAFKA_REQUEST_TOPIC: ${KAFKA_REQUEST_TOPIC}
+      KAFKA_RESPONSE_TOPIC: ${KAFKA_RESPONSE_TOPIC}
+      KAFKA_TELEMETRY_FEED_TOPIC: ${KAFKA_TELEMETRY_FEED_TOPIC}
+    ports:
+      - "8040:8080"
+    depends_on:
+      - postgres
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.8
+  
+  srv-docs:
+    container_name: srv-docs
+    build:
+      context: SmartHome.Docs
+      dockerfile: Dockerfile
+    ports:
+      - "8094:80"
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.9
+    
+  srv-devices:
+    container_name: srv-devices
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    build:
+      context: SmartHome.Devices
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DB_HOST: "postgres"
+      DB_PORT: 5432
+      DB_DATABASE: "devices"
+      DB_USERNAME: "postgres"
+      DB_PASSWORD: "postgres"
+      Kafka:BootstrapServers: ${KAFKA_HOST}:${KAFKA_PORT}
+      Kafka:GroupId: ${KAFKA_GROUP_ID}
+      Kafka:RequestTopic: ${KAFKA_REQUEST_TOPIC}
+      Kafka:ResponseTopic: ${KAFKA_RESPONSE_TOPIC}
+      Keycloak:Host: ${KEYCLOAK_HOSTNAME}
+      Keycloak:Port: ${KEYCLOAK_PORT}
+      Keycloak:Realm: ${KEYCLOAK_REALM}      
+      Keycloak:Authority: http://${KEYCLOAK_HOSTNAME}:${KEYCLOAK_PORT}/realms/${KEYCLOAK_REALM}
+    #    restart: always
+    ports:
+      - "8095:8080"
+    depends_on:
+      - postgres
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.10
+  
+  srv-telemetry:
+    container_name: srv-telemetry
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+    build:
+      context: SmartHome.Telemetry
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DB_HOST: "postgres"
+      DB_PORT: 5432
+      DB_DATABASE: "telemetry"
+      DB_USERNAME: "postgres"
+      DB_PASSWORD: "postgres"
+      SEED_TELEMETRY_DB: ${SEED_DB}
+      SEED_TELEMETRY_DATA: ${SEED_TELEMETRY_DATA}
+      Kafka:BootstrapServers: ${KAFKA_HOST}:${KAFKA_PORT}
+      Kafka:GroupId: ${KAFKA_GROUP_ID}
+      Kafka:Topic: ${KAFKA_TELEMETRY_FEED_TOPIC}
+    #    restart: always
+    ports:
+      - "8096:8080"
+    depends_on:
+      - postgres
+    networks:
+      smart-network:
+        ipv4_address: 172.24.0.11
+
+
+networks:
+  smart-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.24.0.0/24

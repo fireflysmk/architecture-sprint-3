@@ -38,6 +38,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- with .Values.environment }}
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "{{ .SPRING_PROFILES_ACTIVE }}"
             - name: DB_HOST
               value: "{{ .DB_HOST }}"
             - name: DB_PORT
@@ -48,8 +50,6 @@ spec:
               value: "{{ .DB_USER }}"
             - name: DB_PASSWORD
               value: "{{ .DB_PASSWORD }}"
-            - name: SPRING_PROFILES_ACTIVE
-              value: "{{ .SPRING_PROFILES_ACTIVE }}"
           {{- end }}
           ports:
             - name: http

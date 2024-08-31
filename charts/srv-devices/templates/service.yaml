@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "srv-devices.fullname" . }}
+  labels:
+    {{- include "srv-devices.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "srv-devices.selectorLabels" . | nindent 4 }}
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service-devices
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 30432
+  selector:
+    app: srv-devices
+    tier: database

@@ -48,6 +48,8 @@ Selector labels
 {{- define "smart-home-monolith.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "smart-home-monolith.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+app: {{ include "smart-home-monolith.name" . }}
+version: {{ .Chart.AppVersion }}
 {{- end }}
 
 {{/*

@@ -1,0 +1,53 @@
+
+@startuml C4_Components
+
+!include <c4/C4_Container.puml>
+!include <c4/C4_Component.puml>
+!include <tupadr3/devicons/react>
+!include <tupadr3/devicons2/spring.puml>
+!include <tupadr3/devicons/postgresql.puml>
+
+'skinparam linetype polyline
+'skinparam linetype ortho
+skinparam ParticipantPadding 130
+
+title \n= Диаграмма доменов\n\n
+
+AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="black")
+AddElementTag("repo", $shape=RoundedBoxShape(), $bgColor="transparent", $borderThickness=2, $fontColor="black")
+
+AddRelTag("db", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+AddRelTag("sync", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLinтоe())
+AddRelTag("sync/async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLinтоe())
+
+Enterprise_Boundary(smart_home_co, "Smart Home") {
+
+    System_Boundary(plug_n_play_subdomain, "Subdomain: plug_n_play") {
+        Container(plug_n_play, "Subdomain:\n Plug-n-Play\n Devices", "React JS", "Web App", $tags="domain")
+        Container(device_integration, "Subdomain:\n Partner Devices", "React JS", "Web App", $tags="domain")
+    }
+
+    System_Boundary(device_domain, "Domain: Device Management") {
+            Container(plug_n_play, "Subdomain:\n Plug-n-Play\n Devices", "React JS", "Web App", $tags="domain")
+            Container(device_integration, "Subdomain:\n Partner Devices", "React JS", "Web App", $tags="domain")
+    }
+
+    System_Boundary(temperature_subdomain, "Subdomain: Temperature management") {
+        Container(heating_sys, "Context: Heating system", "React JS", "Handles\n heating system", $tags="domain")
+        Container(sensor_sys, "Context: Sensors", "React JS", "Handles\n reading / calling sensors", $tags="domain")
+    }
+
+    System_Boundary(customize_domain, "Domain: User Customization") {
+        Container(user_adjustment, "Subdomain:\n User Adjustment", "React JS", "Web App", $tags="domain")
+    }
+
+}
+
+
+
+
+SHOW_FLOATING_LEGEND()
+
+footer drawn with PlantUML v. %version() and C4-PlantUML v. C4Version()
+@enduml

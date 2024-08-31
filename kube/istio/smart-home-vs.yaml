@@ -1,0 +1,57 @@
+﻿apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: smart-home
+  namespace: smart-home
+spec:
+  hosts:
+    - smart-home.local
+  gateways:
+    - smart-home-gateway
+  http:
+    - match:        
+        - uri:
+            prefix: "/devices/"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: srv-devices
+            port:
+              number: 8080    
+    - match:
+        - uri:
+            prefix: "/docs"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: srv-docs
+            port:
+              number: 80
+    - match:
+        - uri:
+            prefix: "/telemetry/"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: srv-telemetry
+            port:
+              number: 8080
+    - match:
+        - uri:
+            prefix: "/mono/"
+      rewrite:
+        uri: "/"
+      route:
+        - destination:
+            host: smart-home-monolith
+            port:
+              number: 8080
+    - route:
+        - destination:
+            host: srv-devices
+            port:
+              number: 8080
+            subset: v1

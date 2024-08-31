@@ -1,0 +1,68 @@
+
+@startuml C4_Components
+
+!include <c4/C4_Container.puml>
+!include <c4/C4_Component.puml>
+!include <tupadr3/devicons/react>
+!include <tupadr3/devicons2/spring.puml>
+!include <tupadr3/devicons/postgresql.puml>
+
+'skinparam linetype polyline
+'skinparam linetype ortho
+skinparam ParticipantPadding 130
+
+title \n= Диаграмма компонентов\n\n
+
+AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="black")
+AddElementTag("repo", $shape=RoundedBoxShape(), $bgColor="transparent", $borderThickness=2, $fontColor="black")
+
+AddRelTag("db", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+AddRelTag("sync", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLinтоe())
+AddRelTag("sync/async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLinтоe())
+
+System_Boundary(c1, "Smart Home") {
+
+    Container_Boundary(heating-srv, "Heating System") {
+
+        Component(ctr, Heating System\n Controller, Java Spring, Controller, $sprite="spring,scale=.5")
+        Component(srv, Heating System\n Service, Java Spring, Service, $sprite="spring,scale=.5")
+        Component(interface, Heating System\n Interface, Java Spring, Interface, $sprite="spring,scale=.5")
+
+        Component(heating_repo, Heating System\n Repo, Java Spring, Repository, $sprite="spring,scale=.5", $tags=repo)
+        Component(temp_repo, Heating System\n Repo, Java Spring, Repository, $sprite="spring,scale=.5", $tags=repo)
+
+        Component(heating_entity, Heating System\n Entity, Java Spring, Entity, $sprite="spring,scale=.5", $tags=storage)
+        Component(temp_entity, Temp Sensor\n Entity, Java Spring, Entity, $sprite="spring,scale=.5", $tags=storage)
+
+        ContainerDb(heating_db, "Database", "Postgre SQL", "heating_systems", $sprite="postgresql", $tags="storage")
+        ContainerDb(temp_db, "Database", "Postgre SQL", "temp_sensors", $sprite="postgresql", $tags="storage")
+
+    }
+}
+
+System_Boundary(household_sys, "Households") {
+    System_Ext(sensors, "Household\n Sensors")
+}
+
+Rel_Neighbor(srv, household_sys, "polls / calls", "RFC", $tags=sync)
+
+Rel(ctr, srv, "uses", "sync", $tags=sync)
+Rel_Neighbor(srv, interface, "implements")
+
+Rel(srv, heating_repo, "uses")
+Rel(srv, temp_repo, "uses")
+
+Rel(heating_repo, heating_db, "reads/writes :5432", "jdbc")
+Rel(temp_repo, temp_db, "reads/writes :5432", "jdbc")
+
+Rel_L(srv, heating_entity, "uses")
+Rel_L(heating_repo, heating_entity, "uses")
+
+Rel_R(temp_repo, temp_entity, "uses")
+
+
+SHOW_FLOATING_LEGEND()
+
+footer drawn with PlantUML v. %version() and C4-PlantUML v. C4Version()
+@enduml

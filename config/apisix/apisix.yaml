@@ -1,0 +1,97 @@
+routes:    
+  - id: 1
+    uri: /api/heating/*
+    upstream:
+      nodes:
+        - host: 172.24.0.8
+          port: 8080
+          weight: 1
+      type: roundrobin
+  
+  - id: 2
+    uris:
+      - /api/devices
+      - /api/devices/*
+    upstream:
+      nodes:
+        - host: 172.24.0.10
+          port: 8080
+          weight: 1
+      type: roundrobin  
+    
+  - id: 3
+    uris:
+      - /api/telemetry
+      - /api/telemetry/*
+    upstream_id: 3
+    
+  - id: 4
+    uri: /docs
+    upstream_id: 4    
+  
+  - id: 5
+    uri: /api/admin/*
+    upstream:
+      nodes:
+        - host: 172.24.0.10
+          port: 8080
+          weight: 1
+      type: roundrobin
+    plugins:
+      authz-keycloak:
+        client_id: "smart-home-app"
+        client_secret: "7UBsPyXJ8brxJRA91ADNyLkxj2rghEvR"
+        discovery: "http://keycloak:8080/realms/smart-home/.well-known/openid-configuration"
+        realm: "smart-home"
+        ssl_verify: false
+        timeout: 3000
+        policy_enforcement_mode: "ENFORCING"
+        
+upstreams:
+  - id: 1
+    discovery_type: consul
+    pass_host: pass
+    service_name: srv-mono
+    type: roundrobin
+    timeout:
+      connect: 6
+      send: 6
+      read: 6
+
+  - id: 2
+    discovery_type: consul
+    pass_host: pass
+    service_name: srv-devices
+    type: roundrobin
+    timeout:
+      connect: 6
+      send: 6
+      read: 6
+
+  - id: 3
+    name: telemetry
+    discovery_type: consul
+    pass_host: pass
+    service_name: srv-telemetry
+    type: roundrobin
+    timeout:
+      connect: 6
+      send: 6
+      read: 6
+
+  - id: 4
+    name: docs
+    discovery_type: consul
+    pass_host: pass
+    service_name: srv-docs
+    type: roundrobin
+    timeout:
+      connect: 6
+      send: 6
+      read: 6
+
+plugins:
+  - jwt-auth
+  - authz-keycloak  
+
+#END

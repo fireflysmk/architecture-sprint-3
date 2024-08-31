@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "srv-telemetry.fullname" . }}
+  labels:
+    {{- include "srv-telemetry.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "srv-telemetry.selectorLabels" . | nindent 4 }}
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service-telemetry
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 30433
+  selector:
+    app: srv-telemetry
+    tier: database

@@ -1,0 +1,33 @@
+conf:
+  listen:
+    host: 0.0.0.0     # The address that the Dashboard listens on
+    port: 9000        # The port that the Dashboard listens on
+
+  allow_list:         # List of IP addresses allowed to access the Dashboard
+    - 0.0.0.0/0       # This allows access from any IP. Adjust for security in production.
+
+  etcd:
+    endpoints:        # The etcd endpoints that the Dashboard uses
+      - "http://etcd:2379"
+    username: ~       # etcd username, if authentication is enabled
+    password: ~       # etcd password, if authentication is enabled
+
+  log:
+    error_log:
+      level: warn     # Log level: debug, info, warn, error, panic, fatal
+      file_path:      # Path to the error log file. If empty, logs to stderr
+        /usr/local/apisix-dashboard/logs/error.log
+
+authentication:
+  secret: secret      # Secret for JWT token generation
+  expire_time: 3600   # JWT token expiration time in seconds
+  users:              # List of users who can access the Dashboard
+    - username: admin
+      password: admin
+
+plugins:              # List of available plugins
+  - api-breaker
+  - authz-keycloak
+  - basic-auth
+  - batch-requests
+  # Add more plugins as needed

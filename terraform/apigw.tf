@@ -2,7 +2,7 @@
 resource "kubernetes_deployment" "hello_world" {
   metadata {
     name      = "hello-world"
-    namespace = "default"
+    namespace = "smart-home"
     labels = {
       app = "hello-world"
     }
@@ -37,17 +37,17 @@ resource "kubernetes_deployment" "hello_world" {
 resource "kubernetes_service" "hello_world_svc" {
   metadata {
     name      = "hello-world-svc"
-    namespace = "default"
+    namespace = "smart-home"
   }
 
   spec {
     selector = {
-      app = "hello-world"
+      app = "hello-world"      
     }
 
     port {
       port        = 8080
-      target_port = 8080
+      target_port = 8080      
     }
   }
 }

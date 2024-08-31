@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartHome.Telemetry", "SmartHome.Telemetry\SmartHome.Telemetry.csproj", "{68CC0E10-95B9-4276-9698-35FA1713879F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartHome.Devices", "SmartHome.Devices\SmartHome.Devices.csproj", "{41E4F82A-B881-41F4-86B8-3D4F946C5F11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartHome.Devices.Tests", "SmartHome.Devices.Tests\SmartHome.Devices.Tests.csproj", "{79854F43-012E-467A-BF79-743D21600663}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{33DF6197-4D77-43CC-B005-681AA3A85013}"
+	ProjectSection(SolutionItems) = preProject
+		compose.yml = compose.yml
+		.env = .env
+		scripts.sh = scripts.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{4691771C-0E13-4BA5-A572-FD9C2058CDAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apisix", "apisix", "{18F58368-3B88-4DC8-BD65-919F62BF2978}"
+	ProjectSection(SolutionItems) = preProject
+		config\apisix\apisix.yaml = config\apisix\apisix.yaml
+		config\apisix\dashboard.yaml = config\apisix\dashboard.yaml
+		config\apisix\gateway-config.yaml = config\apisix\gateway-config.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "consul", "consul", "{5B0A1EE6-C39D-4D50-9773-7C0A9D6670BA}"
+	ProjectSection(SolutionItems) = preProject
+		config\consul\agent.hcl = config\consul\agent.hcl
+		config\consul\smarthome.devices.hcl = config\consul\smarthome.devices.hcl
+		config\consul\smarthome.docs.hcl = config\consul\smarthome.docs.hcl
+		config\consul\smarthome.mono.hcl = config\consul\smarthome.mono.hcl
+		config\consul\smarthome.telemetry.hcl = config\consul\smarthome.telemetry.hcl
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartHome.Telemetry.Tests", "SmartHome.Telemetry.Tests\SmartHome.Telemetry.Tests.csproj", "{D6038757-4F7D-4823-B0A5-299033621476}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{68CC0E10-95B9-4276-9698-35FA1713879F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68CC0E10-95B9-4276-9698-35FA1713879F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68CC0E10-95B9-4276-9698-35FA1713879F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68CC0E10-95B9-4276-9698-35FA1713879F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41E4F82A-B881-41F4-86B8-3D4F946C5F11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41E4F82A-B881-41F4-86B8-3D4F946C5F11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41E4F82A-B881-41F4-86B8-3D4F946C5F11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41E4F82A-B881-41F4-86B8-3D4F946C5F11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79854F43-012E-467A-BF79-743D21600663}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79854F43-012E-467A-BF79-743D21600663}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79854F43-012E-467A-BF79-743D21600663}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79854F43-012E-467A-BF79-743D21600663}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6038757-4F7D-4823-B0A5-299033621476}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6038757-4F7D-4823-B0A5-299033621476}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6038757-4F7D-4823-B0A5-299033621476}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6038757-4F7D-4823-B0A5-299033621476}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4691771C-0E13-4BA5-A572-FD9C2058CDAD} = {33DF6197-4D77-43CC-B005-681AA3A85013}
+		{18F58368-3B88-4DC8-BD65-919F62BF2978} = {4691771C-0E13-4BA5-A572-FD9C2058CDAD}
+		{5B0A1EE6-C39D-4D50-9773-7C0A9D6670BA} = {4691771C-0E13-4BA5-A572-FD9C2058CDAD}
+	EndGlobalSection
+EndGlobal

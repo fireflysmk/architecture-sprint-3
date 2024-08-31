@@ -3,7 +3,9 @@
     activate:
       on-profile: cluster
   datasource:
-    url: jdbc:postgresql://smart-home-monolith-postgresql.default:5432/postgres
+    url: jdbc:postgresql://smart-home-monolith-postgresql.smart-home:5432/smart-home
     username: postgres
     password: postgres
-      
+
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:kafka}:${KAFKA_PORT:9092}

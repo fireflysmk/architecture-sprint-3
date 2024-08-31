@@ -1,0 +1,146 @@
+openapi: 3.0.1
+info:
+  title: Smart Home Telemetry API
+  description: API for managing telemetry data in a Smart Home application.
+  version: v1
+paths:
+  /api/admin:
+    get:
+      tags:
+        - Admin
+      summary: Generates the OpenAPI specification.
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Server Error
+  '/api/telemetry/{id}/latest':
+    get:
+      tags:
+        - Telemetry
+      summary: Gets the latest telemetry data for a device.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the device.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Returns the requested device
+        '404':
+          description: If the device was not found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: If there was an internal server error
+  '/api/telemetry/{id}':
+    get:
+      tags:
+        - Telemetry
+      summary: Gets all telemetry data for a device.
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the device.
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: start
+          in: query
+          description: The start date of the telemetry data.
+          schema:
+            type: string
+            format: date-time
+        - name: end
+          in: query
+          description: The end date of the telemetry data.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Returns the requested device
+        '404':
+          description: If the device was not found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: If there was an internal server error
+  /api/telemetry:
+    post:
+      tags:
+        - Telemetry
+      summary: Adds a new telemetry data for a device.
+      requestBody:
+        description: The new telemetry data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTelemetryDataDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/AddTelemetryDataDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/AddTelemetryDataDto'
+      responses:
+        '200':
+          description: Returns the requested device
+        '500':
+          description: If there was an internal server error
+components:
+  schemas:
+    AddTelemetryDataDto:
+      required:
+        - data
+        - deviceId
+      type: object
+      properties:
+        deviceId:
+          type: integer
+          format: int64
+        data:
+          minLength: 1
+          type: string
+      additionalProperties: false
+      description: AddTelemetryDataDto
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
+      additionalProperties: { }

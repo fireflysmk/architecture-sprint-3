@@ -1,0 +1,151 @@
+openapi: "3.0.3"
+info:
+  title: "smart_home_monolith API"
+  description: "smart_home_monolith API"
+  version: "1.0.0"
+servers:
+  - url: "https://smart_home_monolith"
+paths:
+  /api/heating/{id}:
+    get:
+      summary: "Get heating system by id"
+      description: "Get heating system by id"
+      operationId: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HeatingSystemDto"
+    put:
+      summary: "Update heating system by id and heating system data"
+      description: "Update heating system by id and heating system data"
+      operationId: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeatingSystemDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HeatingSystemDto"
+  /api/heating/{id}/turn-on:
+    post:
+      summary: "Turn on heating system by id"
+      description: "Turn on heating system by id"
+      operationId: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /api/heating/{id}/turn-off:
+    post:
+      summary: "Turn off heating system by id"
+      description: "Turn off heating system by id"
+      operationId: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /api/heating/{id}/set-temperature:
+    post:
+      summary: "Set target temperature for heating system by id"
+      description: "Set target temperature for heating system by id"
+      operationId: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "temperature"
+          in: "query"
+          required: true
+          schema:
+            type: "number"
+            format: "double"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Void"
+  /api/heating/{id}/current-temperature:
+    get:
+      summary: "Get current temperature for heating system by id"
+      description: "Get current temperature for heating system by id"
+      operationId: ""
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "number"
+                format: "double"
+components:
+  schemas:
+    HeatingSystemDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        targetTemperature:
+          type: "number"
+          format: "double"
+        currentTemperature:
+          type: "number"
+          format: "double"
+    Void:
+      type: "object"
+      properties: { }

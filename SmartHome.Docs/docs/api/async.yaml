@@ -1,0 +1,117 @@
+asyncapi: '3.0.0'
+info:
+  title: Smart Home Event Stream
+  version: '1.0.0'
+  description: Event-driven communication for the Smart Home application.
+
+servers:
+  development:
+    url: localhost:29092
+    protocol: kafka
+    description: Development Kafka broker
+  production:
+    url: kafka:9092
+    protocol: kafka
+    description: Development Kafka broker
+
+channels:
+  smart-home-commands-requests:
+    description: Channel for rpc calls
+    publish:
+      operationId: call
+      summary: Publish a command call
+      message:
+        contentType: application/json
+        payload:
+          type: object
+          $ref: '#/components/schemas/DeviceMessage'
+    subscribe:
+      summary: Subscribe to a command call
+      operationId: onCall
+      message:
+        contentType: application/json
+        payload:
+          type: object
+          $ref: '#/components/schemas/DeviceMessage'
+
+  smart-home-commands-responses:
+    description: Channel for rpc calls execution results
+    publish:
+      operationId: sendCommandMessage
+      summary: Publish a command result
+      message:
+        contentType: application/json
+        payload:
+          type: string
+          example: "The command was executed successfully. The target temperature is 25.0 degrees."
+    subscribe:
+      summary: Subscribe to a command result
+      operationId: onSendCommandMessage
+      message:
+        contentType: application/json
+        payload:
+          type: string
+
+  smart-home-telemetry-feed:
+    description: Channel for telemetry data from a device
+    parameters:
+      deviceId:
+        description: ID of the device
+        schema:
+          type: string
+    publish:
+      operationId: sendTelemetryData
+      summary: Publish telemetry data from a device
+      message:
+        contentType: application/json
+        payload:
+          type: string
+          example: "Passing telemetry data for device id 12. The target temperature is 25.0 degrees."
+    subscribe:
+      summary: Subscribe to telemetry data from a device
+      operationId: onTelemetryData
+      message:
+        contentType: application/json
+        payload:
+          type: string
+
+components:
+  schemas:
+    TelemetryData:
+      type: object
+      properties:
+        Id:
+          type: integer
+        DeviceId:
+          type: integer
+        Data:
+          type: string
+        CreatedAt:
+          type: string
+          format: date-time
+    DeviceMessage:
+      type: object
+      properties:
+        DeviceId:
+          type: integer
+        Command:
+          $ref: '#/components/schemas/CommandType'
+        Payload:
+          type: string
+      example:
+        DeviceId: 1
+        CommandType: "SetTemperature"
+        Payload: "25.0"
+
+    CommandType:
+      type: string
+      description: The type of the command
+      enum:
+        - On
+        - Off
+        - SetTemperature
+      example: On
+
+tags:
+  - name: kafka
+    description: Kafka messaging

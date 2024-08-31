@@ -13,3 +13,20 @@ spec:
       name: http
   selector:
     {{- include "smart-home-monolith.selectorLabels" . | nindent 4 }}
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service-mono
+spec:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+      nodePort: 30434
+  selector:
+    app: smart-home-monolith-pg
+    tier: database

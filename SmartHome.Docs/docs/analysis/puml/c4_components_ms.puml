@@ -1,0 +1,143 @@
+@startuml
+
+'!define SPRITESURL https://raw.githubusercontent.com/plantuml-stdlib/gilbarbara-plantuml-sprites/v1.1/sprites
+
+!include <c4/C4_Component.puml>
+!include <tupadr3/devicons/react>
+!include <tupadr3/devicons/java>
+!include <tupadr3/devicons/dotnet.puml>
+!include <tupadr3/devicons/postgresql.puml>
+!include <tupadr3/font-awesome/users>
+'!include SPRITESURL/kafka.puml
+'!include SPRITESURL/consul.puml
+
+' Settings
+scale 0.7
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam HyperlinkColor #335DA5
+skinparam HyperlinkUnderline false
+skinparam wrapWidth 200
+
+'skinparam linetype ortho
+'skinparam linetype polyline
+
+' Tags and styles
+AddElementTag("users", $bgColor="transparent", $fontColor="#335DA5", $borderThickness="0")
+AddElementTag("webApp", $bgColor="#87CEFA", $fontColor="#000000", $borderColor="#4682B4")
+AddElementTag("microService", $bgColor="transparent", $fontColor="#000000", $borderStyle="dashed")
+AddElementTag("gateway", $sprite="react", $shadowing="true", $shape=EightSidedShape(), $bgColor="#335DA5", $legendText="host")
+AddElementTag("queue", $bgColor="aliceblue", $fontColor="black", $borderColor="darkgrey", $borderThickness="2")
+
+AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="black")
+
+title \n= Компонентная диаграмма smart-home (микросервисы)\n\n\n
+
+' Define users and admin
+Person(user, "Пользователь", "Пользователи приложения", $sprite="users", $tags="users")
+Person(admin, "Администратор")
+
+' Define the main system boundary
+System_Boundary(heating_system, "[[c4_component.puml Smart Home System »»]]") {
+
+    ' Web App Container and Components
+    Container(web_app, "Web App", "React JS", "Web App", $tags="app") {
+        Component(web_ui, "User Interface", "React Components", "Renders the UI for the users")
+        Component(auth_service, "Authentication Service", "Handles user authentication and authorization")
+        Component(api_client, "API Client", "Communicates with backend APIs")
+    }
+
+    ' API Gateway and Consul
+    together {
+        Container(gateway, "Gateway", "APISIX", "API Gateway", $sprite="spring,scale=0.5", $tags="gateway")
+        Container(consul, "Consul", "Service Discovery", "Service Discovery and Health Checking", $sprite="consul", $tags="discovery")
+    }
+
+    together {
+
+    ' Heating Service Container and Components
+    Container(smart_home_srv, "Heating Service", "Java Spring", "Heating service", $sprite="java", $tags="microService") {
+        Component(heating_controller, "Heating Controller", "Controls heating operations")
+        Component(temperature_service, "Temperature Service", "Handles temperature data")
+        Component(heating_repository, "Heating Repository", "Data access layer for heating data")
+    }
+
+    ' Telemetry Service Container and Components
+    Container(telemetry_srv, "Telemetry Service", "C# ASP.NET", "Telemetry service", $sprite="dotnet", $tags="microService") {
+        Component(telemetry_processor, "Telemetry Processor", "Processes telemetry data")
+        Component(telemetry_repository, "Telemetry Repository", "Data access layer for telemetry data")
+        Component(telemetry_api, "Telemetry API", "API for external access")
+    }
+
+    ' Device Service Container and Components
+    Container(device_srv, "Device Service", "C# ASP.NET", "Device service", $sprite="dotnet", $tags="microService") {
+        Component(device_controller, "Device Controller", "Handles device commands")
+        Component(device_repository, "Device Repository", "Data access layer for devices")
+        Component(device_api, "Device API", "API for external access")
+    }
+
+    ' House Service Container and Components
+    Container(house_srv, "House Service", "C# ASP.NET", "House service", $sprite="dotnet", $tags="microService") {
+        Component(house_manager, "House Manager", "Manages house operations")
+        Component(house_repository, "House Repository", "Data access layer for house data")
+        Component(house_api, "House API", "API for external access")
+    }
+    }
+
+    ' Message Broker
+    ContainerQueue(message_bus, "Message Broker", "Kafka", "Broker", $sprite="kafka,scale=0.5", $tags="queue")
+
+    ' Databases (positioned below)
+    ContainerDb(smart_home_db, "Heating", "Postgre SQL", "Heating \n storage", $sprite="postgresql", $tags="storage")
+    ContainerDb(telemetry_db, "Telemetry", "Postgre SQL", "Telemetry\n storage", $sprite="postgresql", $tags="storage")
+    ContainerDb(device_db, "Database", "Postgre SQL", "Device\n storage", $sprite="postgresql", $tags="storage")
+    ContainerDb(house_db, "Database", "Postgre SQL", "House\n storage", $sprite="postgresql", $tags="storage")
+}
+
+' Define relationships
+Rel(user, web_ui, "uses", "HTTPS")
+Rel(admin, web_ui, "uses", "HTTPS")
+Rel_Neighbor(web_ui, api_client, "uses", "HTTPS")
+Rel_Neighbor(api_client, auth_service, "uses", "HTTP")
+Rel_D(api_client, gateway, "uses", "HTTP")
+
+Rel(heating_controller, temperature_service, "uses", "HTTP")
+Rel(temperature_service, heating_repository, "uses", "JDBC")
+Rel(telemetry_processor, telemetry_repository, "uses", "JDBC")
+Rel(telemetry_api, telemetry_processor, "uses", "HTTP")
+Rel(device_controller, device_repository, "uses", "JDBC")
+Rel(device_api, device_controller, "uses", "HTTP")
+Rel(house_manager, house_repository, "uses", "JDBC")
+Rel(house_api, house_manager, "uses", "HTTP")
+
+' Service Discovery
+Rel_Neighbor(gateway, consul, "routes", "HTTP")
+Rel(gateway, telemetry_srv, "routes", "HTTP")
+Rel(gateway, device_srv, "routes", "HTTP")
+Rel(gateway, smart_home_srv, "routes", "HTTP")
+Rel(gateway, house_srv, "routes", "HTTP")
+
+' Message Broker
+Rel_U(telemetry_srv, message_bus, "sub", "HTTP")
+Rel_U(device_srv, message_bus, "pub / sub", "HTTP")
+Rel_U(smart_home_srv, message_bus, "pub / sub", "HTTP")
+
+' Databases
+Rel_D(heating_repository, smart_home_db, "reads/writes :5432", "JDBC")
+Rel_D(telemetry_repository, telemetry_db, "writes :5432", "JDBC")
+Rel_D(device_repository, device_db, "reads/writes :5432", "JDBC")
+Rel_D(house_repository, house_db, "reads/writes :5432", "JDBC")
+
+' Layout
+Lay_Distance(web_app, gateway, 1)
+Lay_Distance(gateway, smart_home_srv, 2)
+Lay_Distance(smart_home_srv, smart_home_db, 2)
+Lay_Distance(telemetry_srv, telemetry_db, 2)
+Lay_Distance(device_srv, device_db, 2)
+Lay_Distance(house_srv, house_db, 2)
+
+' Floating legend
+'SHOW_FLOATING_LEGEND()
+
+footer drawn with PlantUML v. %version() and C4-PlantUML v. C4Version()
+@enduml

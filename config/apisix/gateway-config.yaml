@@ -1,0 +1,40 @@
+apisix:
+  node_listen: 9080
+  enable_ipv6: false
+  config_center: yaml
+  enable_admin: false
+
+deployment:
+  role: data_plane
+  role_data_plane:
+    config_provider: yaml
+  admin:
+    allow_admin:
+      - 0.0.0.0/0
+
+    admin_key:
+      - name: "admin"
+        key: edd1c9f034335f136f87ad84b625c8f1
+        role: admin
+
+      - name: "viewer"
+        key: 4054f7cf07e344346cd3f287985e76a2
+        role: viewer
+
+# USE with etcd configuration store
+#  etcd:
+#    endpoints:
+#      - "http://etcd:2379"
+#      - ::/0
+#    host:                           # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
+#      - "http://etcd:2379"          # multiple etcd address
+#    prefix: "/sharding-repl-cache-gateway"               # sharding-repl-cache-gateway configurations prefix
+#    timeout: 30                     # 30 seconds
+
+discovery:
+  consul:
+    servers:
+      - "http://consul:8500"
+    dump:
+      path: "logs/consul.dump"
+      expire: 2592000

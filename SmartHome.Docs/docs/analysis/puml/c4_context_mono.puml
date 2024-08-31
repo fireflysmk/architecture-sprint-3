@@ -1,0 +1,73 @@
+
+@startuml
+
+!include <c4/C4_Container.puml>
+!include <tupadr3/devicons/react>
+!include <tupadr3/devicons/docker.puml>
+!include <tupadr3/devicons/react>
+!include <tupadr3/devicons/java>
+!include <tupadr3/devicons/postgresql.puml>
+!include <tupadr3/devicons/python.puml>
+!include <tupadr3/devicons/dotnet.puml>
+!include <tupadr3/devicons/docker.puml>
+!include <tupadr3/devicons/msql_server.puml>
+!include <tupadr3/devicons2/spring.puml>
+!include <tupadr3/font-awesome/users>
+!include <tupadr3/font-awesome/server>
+!include <tupadr3/font-awesome/envelope>
+'!include <cloudogu/tools/docker>
+'allowmixing
+
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam HyperlinkColor #335DA5
+skinparam HyperlinkUnderline false
+skinparam wrapWidth 200
+
+title \n= Архитектура приложения (монолит)\n\n\n
+
+'HIDE_STEREOTYPE()
+SHOW_PERSON_PORTRAIT()
+
+AddElementTag("users", $bgColor="transparent", $fontColor="#335DA5", $borderThickness="0")
+AddElementTag("app", $sprite="react", $shadowing="true", $bgColor="#335DA5", $legendText="host")
+AddElementTag("microService", $sprite="java,scale=1", $shadowing="true", $legendText="micro service (eight sided) (no text, no back color)")
+AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335DA5", $shape=EightSidedShape(), $legendText="backend container (eight sided)")
+AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="black")
+
+Person(user, "Пользователь", "Пользователи приложения", $sprite="users", $tags="users")
+Person(admin, "Администратор")
+'Person(user, "User", $sprite="users", $tags="users")
+
+System_Boundary(heating_system, "[[c4_component_mono.puml Smart Home System »»]]") {
+
+    Container(web_app, "Web App", "React JS", "Web App", $tags="app")
+    Container(mobile_app, "Mobile App", "React Native", "Mobile UI", $tags="app", $sprite="react", $link="http://localhost:63342/sal_awh_36/preview/proto.html")
+
+    Container(heating_srv, "Heating Manager Service", "java spring", "Heating service", $sprite="spring,scale=0.5", $tags="microService")
+
+    ContainerDb(main_db, "smart-home", "Postgre SQL", "Heating manager\n storage", $sprite="postgresql", $tags="storage")
+}
+
+System_Boundary(household_sys, "Households") {
+    System_Ext(sensors, "Household\n Sensors")
+}
+
+
+Rel(user, web_app, "uses :443", "https")
+Rel(admin, web_app, "uses :443", "https")
+
+Rel(user, mobile_app, "uses :443", "https")
+Rel(admin, mobile_app, "uses :443", "https")
+
+Rel(web_app, heating_srv, "requests", "http")
+Rel(mobile_app, heating_srv, "requests", "http")
+
+Rel(heating_srv, main_db, "reads/writes :5432", "jdbc")
+
+Rel_R(heating_srv, household_sys, "reads", "RFC")
+
+'SHOW_FLOATING_LEGEND()
+
+footer drawn with PlantUML v. %version() and C4-PlantUML v. C4Version()
+@enduml

@@ -1,0 +1,9 @@
+dependencies:
+- name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 15.5.20
+- name: kusk-gateway
+  repository: https://kubeshop.github.io/helm-charts
+  version: 0.0.65
+digest: sha256:d286045566bfe42e63ab393a10d456584106acb3db0654f9abd5568592166cba
+generated: "2024-08-23T17:57:54.1791246+03:00"

@@ -1,0 +1,112 @@
+
+@startuml
+
+'!define SPRITESURL https://raw.githubusercontent.com/rabelenda/cicon-plantuml-sprites/v1.0/sprites
+!define SPRITESURL https://raw.githubusercontent.com/plantuml-stdlib/gilbarbara-plantuml-sprites/v1.1/sprites
+
+!include <c4/C4_Container.puml>
+!include <tupadr3/devicons/react>
+!include <tupadr3/devicons/docker.puml>
+!include <tupadr3/devicons/react>
+!include <tupadr3/devicons/java>
+!include <tupadr3/devicons/postgresql.puml>
+!include <tupadr3/devicons/python.puml>
+!include <tupadr3/devicons/dotnet.puml>
+!include <tupadr3/devicons/docker.puml>
+!include <tupadr3/devicons/msql_server.puml>
+!include <tupadr3/devicons2/spring.puml>
+!include <tupadr3/font-awesome/users>
+!include <tupadr3/font-awesome/server>
+!include <tupadr3/font-awesome/envelope>
+'!include SPRITESURL/consul.puml
+'!include SPRITESURL/kafka.puml
+'!include SPRITESURL/kong.puml
+
+'!include <cloudogu/tools/docker>
+'allowmixing
+
+scale 0.7
+
+skinparam defaultFontName SansSerif
+skinparam defaultFontSize 12
+skinparam HyperlinkColor #335DA5
+skinparam HyperlinkUnderline false
+skinparam wrapWidth 200
+'skinparam linetype ortho
+'skinparam linetype polyline
+
+title \n= Контекстная диаграмма smart-home (микросервисы)\n\n\n
+
+'HIDE_STEREOTYPE()
+SHOW_PERSON_PORTRAIT()
+
+AddElementTag("users", $bgColor="transparent", $fontColor="#335DA5", $borderThickness="0")
+AddElementTag("app", $sprite="react", $shadowing="true", $bgColor="#335DA5", $legendText="host")
+
+AddElementTag("gateway", $sprite="react", $shadowing="true", $shape=EightSidedShape(), $bgColor="#335DA5", $legendText="host")
+
+AddElementTag("microService", $sprite="java,scale=1", $shadowing="true", $legendText="micro service (eight sided) (no text, no back color)")
+AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335DA5", $shape=EightSidedShape(), $legendText="backend container (eight sided)")
+AddElementTag("storage", $shape=RoundedBoxShape(), $bgColor="lightSkyBlue", $fontColor="black")
+AddElementTag("queue", $bgColor="aliceblue", $fontColor="black", $borderColor="darkgrey", $borderThickness="2")
+
+Person(user, "Пользователь", "Пользователи приложения", $sprite="users", $tags="users")
+Person(admin, "Администратор")
+
+System_Boundary(heating_system, "[[c4_container.puml Smart Home System »»]]") {
+
+    Container(web_app, "Web App", "React JS", "Web App", $tags="app")
+    Container(mobile_app, "Mobile App", "React Native", "Mobile UI", $tags="app", $sprite="react")
+
+    Container(smart_home_srv, "Heating Service", "java spring", "Heating service", $sprite="java", $tags="microService")
+    Container(telemetry_srv, "Telemetry Service", "C# ASP.NET", "Telemetry service", $sprite="dotnet", $tags="microService")
+    Container(house_srv, "House Service", "C# ASP.NET", "House service", $sprite="dotnet", $tags="microService")
+    Container(device_srv, "Device Service", "C# ASP.NET", "СервисDevice service", $sprite="dotnet", $tags="microService")
+
+    Container(gateway, "Gateway", "APISIX", "API Gateway", $sprite="spring,scale=0.5", $tags="gateway")
+    Container(consul, "Consul", "Service Discovery", "Service Discovery and Health Checking", $tags="discovery")
+    ContainerQueue(message_bus, "Message Broker", "Kafka", "Broker", $sprite="kafka,scale=0.5", $tags="queue")
+
+    ContainerDb(smart_home_db, "Heating", "Postgre SQL", "Heating \n storage", $sprite="postgresql", $tags="storage")
+    ContainerDb(telemetry_db, "Telemetry", "Postgre SQL", "Telemetry\n storage", $sprite="postgresql", $tags="storage")
+    ContainerDb(device_db, "Database", "Postgre SQL", "Device\n storage", $sprite="postgresql", $tags="storage")
+    ContainerDb(house_db, "Database", "Postgre SQL", "House\n storage", $sprite="postgresql", $tags="storage")
+}
+
+System_Boundary(household_sys, "Households") {
+    System_Ext(sensors, "Household\n Sensors")
+}
+
+
+Rel(user, web_app, "uses :443", "https")
+Rel(admin, web_app, "uses :443", "https")
+
+Rel(web_app, gateway, "uses :443", "https")
+Rel(mobile_app, gateway, "uses :443", "https")
+
+Rel(gateway, telemetry_srv, "routes", "http")
+Rel(gateway, house_srv, "routes", "http")
+Rel(gateway, device_srv, "routes", "http")
+Rel(gateway, smart_home_srv, "routes", "http")
+Rel_Neighbor(gateway, consul, "routes", "http")
+
+Rel(telemetry_srv, message_bus, "sub", "http")
+Rel(device_srv, message_bus, "pub / sub", "http")
+Rel(smart_home_srv, message_bus, "pub / sub", "http")
+
+Rel(smart_home_srv, smart_home_db, "reads/writes :5432", "jdbc")
+Rel(telemetry_srv, telemetry_db, "writes :5432", "jdbc")
+Rel(device_srv, device_db, "reads/writes :5432", "jdbc")
+Rel(house_srv, house_db, "reads/writes :5432", "jdbc")
+
+Rel(device_srv, household_sys, "reads", "RFC")
+
+Lay_Distance(telemetry_db, telemetry_srv, 1)
+Lay_Distance(smart_home_db, smart_home_srv, 1)
+Lay_Distance(device_db, device_srv, 1)
+Lay_Distance(house_db, house_srv, 1)
+
+'SHOW_FLOATING_LEGEND()
+
+footer drawn with PlantUML v. %version() and C4-PlantUML v. C4Version()
+@enduml

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://smart-home-monolith-postgresql.default:5432/smart_home
+    url: jdbc:postgresql://localhost:5434/smart-home
     username: postgres
     password: postgres
     hikari:
@@ -14,15 +14,26 @@ spring:
       hibernate:
         boot.allow_jdbc_metadata_access: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
-  
+
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     enabled: true
   
-#  sql:
-#    init:
-#      mode: always
-#      schema-locations: classpath:init.sql
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:localhost}:${KAFKA_PORT:29092}
+    consumer:
+      request-topic: ${KAFKA_REQUEST_TOPIC:smart-home-commands-requests}
+      group-id: ${KAFKA_GROUP_ID:smart-home-group}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: ru.yandex.practicum.smarthome.broker.DeviceMessageDeserializer
+    producer:
+      response-topic: ${KAFKA_RESPONSE_TOPIC:smart-home-commands-responses}
+      telemetry-feed-topic: ${KAFKA_TELEMETRY_FEED_TOPIC:smart-home-telemetry-feed}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 
 server:
   port: 8080
