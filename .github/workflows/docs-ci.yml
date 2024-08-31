@@ -3,10 +3,10 @@
 on:
   push:
     branches:
-      - main
+      - sprint_3
   pull_request:
     branches:
-      - main
+      - sprint_3
 
 env:
   DOCKER_IMAGE_NAME: ghcr.io/synaxintelligence/srv-docs
