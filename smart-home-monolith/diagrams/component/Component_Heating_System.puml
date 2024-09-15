@@ -1,0 +1,44 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь мобильного приложения")
+
+Component(apiGateway, "API Gateway", "Маршрутизатор", "Принимает запросы от пользователя и перенаправляет их к соответствующим сервисам")
+
+Container_Boundary(services, "Сервисы") {
+    Component(lightService, "LightService", "Сервис управления освещением", "Обрабатывает запросы на управление светом")
+    Component(heatingService, "HeatingService", "Сервис управления отоплением", "Обрабатывает запросы на управление отоплением")
+    Component(gatesService, "GatesService", "Сервис управления воротами", "Обрабатывает запросы на управление воротами")
+    Component(watchService, "WatchService", "Сервис наблюдения", "Обрабатывает запросы на наблюдение")
+    Component(userManagementService, "UserManagementService", "Сервис управления пользователями", "Обрабатывает запросы на управление пользователями (регистрация, авторизация и т.д.)")
+}
+
+ContainerDb(database, "Postgres", "База данных", "Хранит данные пользователей и системы умного дома")
+Container(messageQueue, "Kafka", "Брокер сообщений", "Обрабатывает события от датчиков и электро-оборудования")
+
+System_Ext(heatingEquipment, "Интерфейс электро-оборудования (котлы, фонари, ворота, камеры и т.д)", "Взаимодействует с сервисами")
+
+Rel(user, apiGateway, "Отправляет запросы", "HTTP")
+Rel(apiGateway, lightService, "Маршрутизирует запросы")
+Rel(apiGateway, heatingService, "Маршрутизирует запросы")
+Rel(apiGateway, gatesService, "Маршрутизирует запросы")
+Rel(apiGateway, watchService, "Маршрутизирует запросы")
+Rel(apiGateway, userManagementService, "Маршрутизирует запросы")
+
+Rel(lightService, database, "Читает и записывает данные")
+Rel(heatingService, database, "Читает и записывает данные")
+Rel(gatesService, database, "Читает и записывает данные")
+Rel(watchService, database, "Читает и записывает данные")
+Rel(userManagementService, database, "Читает и записывает данные о пользователях")
+
+Rel(lightService, messageQueue, "Публикует и читает события")
+Rel(heatingService, messageQueue, "Публикует и читает события")
+Rel(gatesService, messageQueue, "Публикует и читает события")
+Rel(watchService, messageQueue, "Публикует и читает события")
+
+Rel(lightService, heatingEquipment, "Управляет освещением")
+Rel(heatingService, heatingEquipment, "Управляет отоплением")
+Rel(gatesService, heatingEquipment, "Управляет воротами")
+Rel(watchService, heatingEquipment, "Управляет наблюдением")
+
+@enduml
