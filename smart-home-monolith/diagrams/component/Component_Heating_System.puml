@@ -26,9 +26,7 @@ System_Ext(external_system, "Электрооборудование", "Публ�
 
 Rel(mobile_user, mobile_app, "HTTP/HTTPS")
 Rel(mobile_app, api_gateway, "Отправляет запросы в", "HTTP/HTTPS")
-Rel(api_gateway, user_service, "HTTP/HTTPS")
-Rel(api_gateway, equipment_service, "HTTP/HTTPS")
-Rel(api_gateway, telemetry_service, "HTTP/HTTPS")
+Rel_D(api_gateway, services, "Маршрутизирует запросы", "HTTP/HTTPS")
 
 Rel(user_service, user_db, "Читает и записывает", "ORM")
 Rel(equipment_service, equipment_db, "Читает и записывает", "ORM")
