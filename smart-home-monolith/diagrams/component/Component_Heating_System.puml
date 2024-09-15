@@ -35,8 +35,8 @@ Rel(equipment_service, equipment_db, "Читает и записывает", "OR
 Rel(telemetry_service, telemetry_db, "Читает и записывает", "MongoDB драйвер")
 
 Rel(external_system, kafka, " ")
-Rel(kafka, user_service, " ")
-Rel(kafka, equipment_service, " ")
-Rel(kafka, telemetry_service, " ")
+Rel(kafka, services, "Обрабатывает события", "Kafka topic")
+
+Rel(services, external_system, "Отправляет запросы к", "MQTT/HTTP/CoAP")
 
 @enduml
