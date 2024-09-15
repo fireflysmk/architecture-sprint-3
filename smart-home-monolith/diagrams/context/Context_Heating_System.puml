@@ -4,11 +4,14 @@
 Person(customer, "Клиент", "Пользователь системы отопления")
 
 System_Boundary(monolith, "Система контроля отоплением") {
-    Container(server, "Сервер", "Java Backend", "Управляет логикой управления отоплением и взаимодействует с датчиками")
-    Container(sensor, "Температурный датчик", "Temperature Sensor", "Мониторит температуру и отвечает на запросы сервера")
+    Container(server, "Сервер", "Java Spring Backend", "Управляет логикой управления отоплением и взаимодействует с датчиками температуры в помещении")
 }
 
-Rel(customer, server, "Использует")
-Rel(server, sensor, "Отправляет команды и запрашивает данные о температуре")
+System_Ext(system, "Отопительное оборудование", "Heating System")
+System_Ext(sensor, "Температурный датчик", "Temperature Sensor")
+
+Rel(customer, server, "Использует для управления отоплением")
+Rel(server, system, "Отправляет команды для управления отоплением")
+Rel(server, sensor, "Запрашивает данные о температуре в помещении")
 
 @enduml
