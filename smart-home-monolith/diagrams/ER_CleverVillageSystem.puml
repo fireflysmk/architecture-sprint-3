@@ -1,0 +1,66 @@
+@startuml
+entity "User" {
+    *id: UUID4
+    *created_at: datetime
+}
+
+entity "Equipment" {
+    *id: UUID4
+    *created_at: datetime
+    name: varchar
+    vendor_name: varchar
+    description: text
+}
+
+entity "UserEquipment" {
+    *id: UUID4
+    *created_at: datetime
+    user_id: UUID4
+    equipment_id: UUID4
+    turn_on: bool
+    state_data: JSON
+}
+
+entity "Sensor" {
+    *id: UUID4
+    *created_at: datetime
+    type: enum
+}
+
+entity "EquipmentSensor" {
+    *id: UUID4
+    *created_at: datetime
+    equipment_id: UUID4
+    sensor_id: UUID4
+    turn_on: bool
+    state_data: JSON
+}
+
+entity "Events" {
+    *id: UUID4
+    *created_at: datetime
+    sensor_id: UUID4
+    data: JSON
+}
+
+entity "UserSensor" {
+    *id: UUID4
+    *created_at: datetime
+    user_id: UUID4
+    sensor_id: UUID4
+    turn_on: bool
+    state_data: JSON
+}
+
+' Связи между таблицами
+User ||--o{ UserEquipment : "1:M"
+Equipment ||--o{ UserEquipment : "1:M"
+
+Equipment ||--o{ EquipmentSensor : "1:M"
+Sensor ||--o{ EquipmentSensor : "1:M"
+
+Sensor ||--o{ Events : "1:M"
+
+User ||--o{ UserSensor : "1:M"
+Sensor ||--o{ UserSensor : "1:M"
+@enduml
