@@ -1,0 +1,20 @@
+@startuml
+!include <C4/C4_Component>
+
+Container_Boundary(UserService_Boundary, "UserService") {
+    Component(UserController, "UserController", "REST Controller", "Обрабатывает запросы пользователя")
+    Component(IUserService, "IUserService", "Interface", "Интерфейс бизнес-логики пользователей")
+    Component(UserServiceImpl, "UserServiceImpl", "Service", "Реализация бизнес-логики для пользователей")
+
+    Component(IUserRepository, "IUserRepository", "Interface", "Интерфейс доступа к данным пользователей")
+    Component(UserRepositoryImpl, "UserRepositoryImpl", "Repository", "Реализует доступ к данным пользователей")
+
+    ' Связи
+    UserController --> IUserService : "Вызывает"
+    UserServiceImpl ..> IUserService : "Реализует"
+    IUserService --> IUserRepository : "Вызывает"
+    UserServiceImpl ..> IUserRepository : "Вызывает"
+    UserRepositoryImpl ..> IUserRepository : "Реализует"
+}
+
+@enduml
