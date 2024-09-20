@@ -11,7 +11,7 @@ System_Boundary(b_system, "Система Умной Деревни") {
 
     Container_Boundary(services, "Микросервисы") {
         Container(user_service, "UserService", "Golang", "Управляет информацией о пользователях и их взаимодействиями")
-        Container(equipment_service, "EquipmentService", "Golang", "Управляет оборудованием и его контролем")
+        Container(device_service, "DeviceService", "Golang", "Управляет оборудованием и его контролем")
         Container(telemetry_service, "TelemetryService", "Golang", "Обрабатывает телеметрию от оборудования")
     }
 
@@ -29,7 +29,7 @@ Rel(mobile_app, api_gateway, "Отправляет запросы в", "HTTP/HTT
 Rel_D(api_gateway, services, "Маршрутизирует запросы", "HTTP/HTTPS")
 
 Rel(user_service, user_db, "Читает и записывает", "ORM")
-Rel(equipment_service, equipment_db, "Читает и записывает", "ORM")
+Rel(device_service, equipment_db, "Читает и записывает", "ORM")
 Rel(telemetry_service, telemetry_db, "Читает и записывает", "MongoDB драйвер")
 
 Rel(external_system, kafka, " ")
