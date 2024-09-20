@@ -49,7 +49,7 @@ entity "Device" {
 entity "Sensor" {
     *id: UUID4
     *created_at: datetime
-    *type: enum: Temperature || Moving || etc
+    *type: enum: Temperature || Moving || etc.
     *vendor_name: varchar
 }
 
