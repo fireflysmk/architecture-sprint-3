@@ -1,66 +1,70 @@
 @startuml
 entity "User" {
     *id: UUID4
+    *username: varchar
+    *first_name: varchar
+    *last_name: varchar
+    *password: varchar
     *created_at: datetime
 }
 
-entity "Equipment" {
+entity "House" {
     *id: UUID4
     *created_at: datetime
-    name: varchar
-    vendor_name: varchar
-    description: text
+    *address: varchar
+    *square: integer
+    *user_id: UUID4
 }
 
-entity "UserEquipment" {
+entity "Module" {
     *id: UUID4
     *created_at: datetime
-    user_id: UUID4
-    equipment_id: UUID4
-    turn_on: bool
-    state_data: JSON
+    *type: Heating || Watcher || Gates || etc.
+}
+
+entity "HouseModule" {
+    *id: UUID4
+    *house_id: UUID4
+    *module_id: UUID4
+}
+
+entity "SensorModule" {
+    *id: UUID4
+    *module_id: UUID4
+    *sensor_id: UUID4
+}
+
+entity "Device" {
+    *id: UUID4
+    *created_at: datetime
+    *name: varchar
+    *vendor_name: varchar
+    *description: text
+    *module_id: UUID4
 }
 
 entity "Sensor" {
     *id: UUID4
     *created_at: datetime
-    type: enum
+    *type: enum: Temperature || Moving || etc
 }
 
-entity "EquipmentSensor" {
+entity "TelemetryData" {
     *id: UUID4
     *created_at: datetime
-    equipment_id: UUID4
-    sensor_id: UUID4
-    turn_on: bool
-    state_data: JSON
+    *source_id: UUID4
+    *source_type: enum: module || sensor
+    *data: JSON
 }
 
-entity "Events" {
-    *id: UUID4
-    *created_at: datetime
-    sensor_id: UUID4
-    data: JSON
-}
+User ||--o{ House : "1:M"
+House ||--o{ HouseModule : "M2M"
+Module ||--o{ HouseModule : "M2M"
+Module ||--o{ Device : "1:M"
 
-entity "UserSensor" {
-    *id: UUID4
-    *created_at: datetime
-    user_id: UUID4
-    sensor_id: UUID4
-    turn_on: bool
-    state_data: JSON
-}
+Module ||--o{ SensorModule : "1:M"
+Sensor ||--o{ SensorModule : "1:M"
 
-' Связи между таблицами
-User ||--o{ UserEquipment : "1:M"
-Equipment ||--o{ UserEquipment : "1:M"
-
-Equipment ||--o{ EquipmentSensor : "1:M"
-Sensor ||--o{ EquipmentSensor : "1:M"
-
-Sensor ||--o{ Events : "1:M"
-
-User ||--o{ UserSensor : "1:M"
-Sensor ||--o{ UserSensor : "1:M"
+SensorModule ||--o{ TelemetryData : "1:M"
+HouseModule ||--o{ TelemetryData : "1:M"
 @enduml
