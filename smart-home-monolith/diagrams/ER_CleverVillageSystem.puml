@@ -20,18 +20,21 @@ entity "Module" {
     *id: UUID4
     *created_at: datetime
     *type: Heating || Watcher || Gates || etc.
+    *description: text
 }
 
 entity "HouseModule" {
     *id: UUID4
     *house_id: UUID4
     *module_id: UUID4
+    *turn_on: boolean
 }
 
 entity "SensorModule" {
     *id: UUID4
     *module_id: UUID4
     *sensor_id: UUID4
+    *turn_on: boolean
 }
 
 entity "Device" {
@@ -47,13 +50,14 @@ entity "Sensor" {
     *id: UUID4
     *created_at: datetime
     *type: enum: Temperature || Moving || etc
+    *vendor_name: varchar
 }
 
 entity "TelemetryData" {
     *id: UUID4
     *created_at: datetime
     *source_id: UUID4
-    *source_type: enum: module || sensor
+    *source_type: enum: HouseModule || SensorModule
     *data: JSON
 }
 
