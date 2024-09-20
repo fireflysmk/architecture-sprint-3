@@ -12,7 +12,7 @@ entity "House" {
     *id: UUID4
     *created_at: datetime
     *address: varchar
-    *square: integer
+    *square: decimal
     *user_id: UUID4
 }
 
