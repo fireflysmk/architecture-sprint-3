@@ -58,7 +58,7 @@ entity "TelemetryData" {
     *created_at: datetime
     *source_id: UUID4
     *source_type: enum: HouseModule || SensorModule
-    *data: JSON
+    *event_data: JSON
 }
 
 User ||--o{ House : "1:M"
