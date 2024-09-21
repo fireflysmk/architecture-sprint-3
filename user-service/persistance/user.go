@@ -7,3 +7,7 @@ type UserModel struct {
 	Username string `gorm:"uniqueIndex;size:100"`
 	Password string `gorm:"size:255"`
 }
+
+func (UserModel) TableName() string {
+	return "users"
+}

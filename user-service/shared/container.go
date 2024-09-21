@@ -5,8 +5,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"user-service/persistance"
 	"user-service/repository"
-	dto_schemas "user-service/repository/dto-schemas"
 	"user-service/service"
 )
 
@@ -21,7 +21,7 @@ func NewAppContainer(ctx context.Context) *Container {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	err = db.AutoMigrate(&dto_schemas.UserDtoSchema{})
+	err = db.AutoMigrate(&persistance.UserModel{})
 	if err != nil {
 		return nil
 	}

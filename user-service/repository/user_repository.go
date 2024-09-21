@@ -31,7 +31,7 @@ func (r *GORMUserRepository) Create(user web_schemas.NewUserIn) error {
 		return errors.New("user already exists")
 	}
 
-	newUser := dto_schemas.UserDtoSchema{
+	newUser := persistance.UserModel{
 		Username: user.Username,
 		Password: user.Password,
 	}
@@ -40,12 +40,19 @@ func (r *GORMUserRepository) Create(user web_schemas.NewUserIn) error {
 }
 
 func (r *GORMUserRepository) GetByUsername(username string) (dto_schemas.UserDtoSchema, error) {
-	var user dto_schemas.UserDtoSchema
+	var user persistance.UserModel
 	err := r.db.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		return dto_schemas.UserDtoSchema{}, errors.New("user not found")
 	}
-	return user, nil
+
+	userDto := dto_schemas.UserDtoSchema{
+		ID:       user.ID,
+		Username: user.Username,
+		Password: user.Password,
+	}
+
+	return userDto, nil
 }
 
 func (r *GORMUserRepository) Update(user web_schemas.NewUserIn) error {
