@@ -12,7 +12,9 @@ func CreateApp(ctx context.Context) *gin.Engine {
 	r := gin.Default()
 
 	userGroup := r.Group("/users")
-	userGroup.GET("/:userId", func(c *gin.Context) { presentation.GetUser(c, appContainer) })
+
+	userGroup.GET("/:userId", func(c *gin.Context) { presentation.GetUserById(c, appContainer) })
+	userGroup.POST("/register", func(c *gin.Context) { presentation.RegisterUser(c, appContainer) })
 
 	return r
 }

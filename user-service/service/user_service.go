@@ -2,8 +2,9 @@ package service
 
 import (
 	"errors"
+	"user-service/presentation/web-schemas"
 	"user-service/repository"
-	"user-service/schemas"
+	"user-service/repository/dto-schemas"
 )
 
 type UserService struct {
@@ -16,7 +17,7 @@ func NewUserService(repo repository.UserRepository) *UserService {
 	}
 }
 
-func (s *UserService) SignUp(user schemas.User) error {
+func (s *UserService) SignUp(user web_schemas.NewUserIn) error {
 	existingUser, _ := s.repo.GetByUsername(user.Username)
 	if existingUser.Username != "" {
 		return errors.New("user already exists")
@@ -34,10 +35,10 @@ func (s *UserService) Login(username, password string) error {
 	return nil
 }
 
-func (s *UserService) Update(user schemas.User) error {
+func (s *UserService) Update(user web_schemas.NewUserIn) error {
 	return s.repo.Update(user)
 }
 
-func (s *UserService) GetCurrent(username string) (schemas.User, error) {
+func (s *UserService) GetCurrent(username string) (dto_schemas.UserDtoSchema, error) {
 	return s.repo.GetByUsername(username)
 }

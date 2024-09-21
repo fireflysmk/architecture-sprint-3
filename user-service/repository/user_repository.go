@@ -2,62 +2,56 @@ package repository
 
 import (
 	"errors"
-	"user-service/schemas"
+	"user-service/presentation/web-schemas"
+	"user-service/repository/dto-schemas"
+
+	"gorm.io/gorm"
 )
 
 type UserRepository interface {
-	Create(user schemas.User) error
-	GetByUsername(username string) (schemas.User, error)
-	Update(user schemas.User) error
+	Create(user web_schemas.NewUserIn) error
+	GetByUsername(username string) (dto_schemas.UserDtoSchema, error)
+	Update(user web_schemas.NewUserIn) error
 }
 
-type InMemoryUserRepository struct {
-	users map[string]schemas.User
+type GORMUserRepository struct {
+	db *gorm.DB
 }
 
-func NewInMemoryUserRepository() *InMemoryUserRepository {
-	repo := &InMemoryUserRepository{
-		users: make(map[string]schemas.User),
+func NewGORMUserRepository(db *gorm.DB) *GORMUserRepository {
+	return &GORMUserRepository{
+		db: db,
 	}
-
-	// debug user storage
-	repo.users["123"] = schemas.User{
-		ID:       "123",
-		Username: "john_doe",
-		Password: "password123",
-		Email:    "john@example.com",
-	}
-
-	repo.users["321"] = schemas.User{
-		ID:       "321",
-		Username: "vlad_baidin",
-		Password: "some_pswd123",
-		Email:    "vlad_baidin@example.com",
-	}
-
-	return repo
 }
 
-func (r *InMemoryUserRepository) Create(user schemas.User) error {
-	if _, exists := r.users[user.Username]; exists {
+func (r *GORMUserRepository) Create(user web_schemas.NewUserIn) error {
+	var existingUser dto_schemas.UserDtoSchema
+	if err := r.db.Where("username = ?", user.Username).First(&existingUser).Error; err == nil {
 		return errors.New("user already exists")
 	}
-	r.users[user.Username] = user
-	return nil
+
+	newUser := dto_schemas.UserDtoSchema{
+		Username: user.Username,
+		Password: user.Password,
+	}
+
+	return r.db.Create(&newUser).Error
 }
 
-func (r *InMemoryUserRepository) GetByUsername(username string) (schemas.User, error) {
-	user, exists := r.users[username]
-	if !exists {
-		return schemas.User{}, errors.New("user not found")
+func (r *GORMUserRepository) GetByUsername(username string) (dto_schemas.UserDtoSchema, error) {
+	var user dto_schemas.UserDtoSchema
+	err := r.db.Where("username = ?", username).First(&user).Error
+	if err != nil {
+		return dto_schemas.UserDtoSchema{}, errors.New("user not found")
 	}
 	return user, nil
 }
 
-func (r *InMemoryUserRepository) Update(user schemas.User) error {
-	if _, exists := r.users[user.Username]; !exists {
+func (r *GORMUserRepository) Update(user web_schemas.NewUserIn) error {
+	var existingUser dto_schemas.UserDtoSchema
+	if err := r.db.Where("username = ?", user.Username).First(&existingUser).Error; err != nil {
 		return errors.New("user not found")
 	}
-	r.users[user.Username] = user
-	return nil
+	existingUser.Password = user.Password
+	return r.db.Save(&existingUser).Error
 }

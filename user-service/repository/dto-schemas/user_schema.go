@@ -1,6 +1,6 @@
-package schemas
+package dto_schemas
 
-type User struct {
+type UserDtoSchema struct {
 	ID       string
 	Username string
 	Password string
