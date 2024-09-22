@@ -3,7 +3,7 @@ package presentation
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	web_schemas "user-service/presentation/web-schemas"
+	"user-service/presentation/web-schemas"
 	"user-service/shared"
 )
 
@@ -42,22 +42,6 @@ func RegisterUser(c *gin.Context, container *shared.Container) {
 	}
 
 	c.JSON(http.StatusCreated, newUserResponse)
-}
-
-func GetUserById(c *gin.Context, container *shared.Container) {
-	userId := c.Param("userId")
-
-	user, err := container.UserService.GetCurrent(userId)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"user": user})
-}
-
-func GetUserByUsername(c *gin.Context, container *shared.Container) {
-
 }
 
 func LoginUser(c *gin.Context, container *shared.Container) {
@@ -128,8 +112,4 @@ func RefreshToken(c *gin.Context, container *shared.Container) {
 		"access_token":  accessToken,
 		"refresh_token": newRefreshToken,
 	})
-}
-
-func UpdateUser(c *gin.Context, container *shared.Container) {
-
 }
