@@ -42,3 +42,7 @@ func (s *UserService) Update(user web_schemas.NewUserIn) error {
 func (s *UserService) GetCurrent(username string) (dto_schemas.UserDtoSchema, error) {
 	return s.repo.GetByUsername(username)
 }
+
+func (s *UserService) GetByUsername(username string) (dto_schemas.UserDtoSchema, error) {
+	return s.repo.GetByUsername(username)
+}

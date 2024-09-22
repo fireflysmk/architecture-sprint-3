@@ -12,6 +12,7 @@ import (
 
 type Container struct {
 	UserService *service.UserService
+	AuthService *service.AuthService
 }
 
 func NewAppContainer(ctx context.Context) *Container {
@@ -28,7 +29,13 @@ func NewAppContainer(ctx context.Context) *Container {
 
 	userRepo := repository.NewGORMUserRepository(db)
 	userService := service.NewUserService(userRepo)
+
+	var accessSecret = []byte("+AAlQmR/sSml0D0QgZ9suJZwtLxHbJAzjvWLYsiER+0=")
+	var refreshSecret = []byte("2hXKd7hDB/28TBKPyR262qVfDi1aX2t00IG99q6wxEc=")
+	authService := service.NewAuthService(accessSecret, refreshSecret)
+
 	return &Container{
 		UserService: userService,
+		AuthService: authService,
 	}
 }
