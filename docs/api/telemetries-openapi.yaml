@@ -1,0 +1,61 @@
+openapi: '3.0.0'
+info:
+  title: Microservice API
+  version: '1.0.0'
+tags:
+  - name: telemetries
+    description: Microservice for telemetries
+paths:
+  /devices/{id}/telemetries:
+    get:
+      tags:
+        - telemetries
+      summary: Get device telemetries
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TelemetryData'
+  /devices/{id}/telemetries/latest:
+    get:
+      tags:
+        - telemetries
+      summary: Get latest device telemetry
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryData'
+
+
+components:
+  schemas:
+    TelemetryData:
+      type: object
+      properties:
+        id:
+          type: string
+        device_id:
+          type: string
+        indications:
+          type: string

@@ -1,0 +1,37 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Пользователь", "Пользователь устройства")
+Person(device, "Устройство", "Устройство пользователя")
+System_Ext(module, "Модуль", "Модуль пользователя")
+
+System_Boundary(system, "Приложение", "Позволяет управлять устройствами пользователям и собирать с них информацию") {
+    Container(gateway, "API Gateway")
+    Container(queue, "Queue", "Kafka")
+
+    ContainerDb(db_telemetries, "Data Base для телеметрии", "PostgreSQL")
+    ContainerDb(db_devices, "Data Base для устройств", "PostgreSQL")
+    ContainerDb(db_clients, "Data Base для пользователей", "PostgreSQL")
+
+    Container(telemetries, "Микросервис по хранение телеметрии", "NodeJS")
+    Container(devices, "Микросервис по управлению устройствами", "NodeJS")
+    Container(clients, "Микросервис по управлению данными клиентов", "NodeJS")
+}
+
+Rel(user, gateway, "Управление устройствами", "Регистрация устройств, изменение параметров устройств и просмотр их телеметрии")
+Rel(device, module, "Взаимодействие", "Подключение устройства, получение новых параметров и передача телеметрии")
+Rel(module, gateway, "Взаимодействие", "Подключение устройств, получение новых параметров и передача телеметрии устройств")
+
+Rel(gateway, telemetries, "Маршрутизация")
+Rel(gateway, devices, "Маршрутизация")
+Rel(gateway, clients, "Маршрутизация")
+
+Rel(telemetries, db_telemetries, "Выполнение запросов")
+Rel(devices, db_devices, "Выполнение запросов")
+Rel(clients, db_clients, "Выполнение запросов")
+
+Rel(gateway, queue, "Отправка сообщений для микросервисов")
+Rel(telemetries, queue, "Отправка и чтение сообщение")
+Rel(devices, queue, "Отправка и чтение сообщение")
+Rel(clients, queue, "Отправка и чтение сообщение")
+@enduml

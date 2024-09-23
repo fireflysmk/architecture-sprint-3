@@ -1,0 +1,177 @@
+asyncapi: 3.0.0
+info:
+  title: Devices Async API
+  version: 1.0.0
+servers:
+  production:
+    host: api.devices.com
+    protocol: kafka
+channels:
+  devices:
+    address: devices
+    messages:
+      addDevice.message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            message_type:
+              type: string
+              const: 'add-device'
+            user_id:
+              type: string
+            serial_number:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+              enum:
+                - heat-checker
+                - light-manager
+                - door-manager
+                - videocamera
+      updateDevice.message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            message_type:
+              type: string
+              const: 'update-device'
+            id:
+              type: string
+            name:
+              type: string
+            current_parameters:
+              type: string
+            status:
+              type: boolean
+            house_id:
+              type: string
+            module_id:
+              type: string
+      deleteDevice.message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            message_type:
+              type: string
+              const: 'delete-device'
+            id:
+              type: string
+    description: Channel for publishing device messages
+
+  modules:
+    address: modules
+    messages:
+      addModule.message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            message_type:
+              type: string
+              const: 'add-module'
+            user_id:
+              type: string
+            serial_number:
+              type: string
+            name:
+              type: string
+      updateModule.message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            message_type:
+              type: string
+              const: 'update-module'
+            id:
+              type: string
+            status:
+              type: boolean
+            name:
+              type: string
+            house_id:
+              type: string
+      deleteModule.message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            message_type:
+              type: string
+              const: 'delete-module'
+            id:
+              type: string
+    description: Channel for publishing module messages
+
+  telemetries:
+    address: telemetries
+    messages:
+      addTelemetry.message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            message_type:
+              type: string
+              const: 'add-telemetry'
+            device_id:
+              type: string
+            indications:
+              type: string
+    description: Channel for publishing telemetry messages
+
+operations:
+  publishNewDevice:
+    action: send
+    channel:
+      $ref: '#/channels/devices'
+    summary: Publish new device data
+    messages:
+      - $ref: '#/channels/devices/messages/addDevice.message'
+  publishUpdateDevice:
+    action: send
+    channel:
+      $ref: '#/channels/devices'
+    summary: Publish update device data
+    messages:
+      - $ref: '#/channels/devices/messages/updateDevice.message'
+  publishDeleteDevice:
+    action: send
+    channel:
+      $ref: '#/channels/devices'
+    summary: Publish delete device
+    messages:
+      - $ref: '#/channels/devices/messages/deleteDevice.message'
+  publishNewModule:
+    action: send
+    channel:
+      $ref: '#/channels/modules'
+    summary: Publish new module data
+    messages:
+      - $ref: '#/channels/modules/messages/addModule.message'
+  publishUpdateModule:
+    action: send
+    channel:
+      $ref: '#/channels/modules'
+    summary: Publish update module data
+    messages:
+      - $ref: '#/channels/modules/messages/updateModule.message'
+  publishDeleteModule:
+    action: send
+    channel:
+      $ref: '#/channels/modules'
+    summary: Publish delete module
+    messages:
+      - $ref: '#/channels/modules/messages/deleteModule.message'
+  publishDeviceTelemetry:
+    action: send
+    channel:
+      $ref: '#/channels/telemetries'
+    summary: Publish device telemetry
+    messages:
+      - $ref: '#/channels/telemetries/messages/addTelemetry.message'

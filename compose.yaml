@@ -1,0 +1,162 @@
+name: microservices
+
+services:
+  postgres_device_service:
+    container_name: postgres_device_service
+    image: dh-mirror.gitverse.ru/postgres:14.8-alpine3.18
+    hostname: postgres_device_service
+    environment:
+      POSTGRES_DB: "db"
+      POSTGRES_USER: "owner"
+      POSTGRES_PASSWORD: "owner"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+      - "5432:5432"
+    networks:
+      app-network:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U owner -d db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      - postgres_device_service_data:/var/lib/postgresql/data
+      - ./services/devices/scripts/db:/docker-entrypoint-initdb.d
+
+  postgres_telemetry_service:
+    container_name: postgres_telemetry_service
+    image: dh-mirror.gitverse.ru/postgres:14.8-alpine3.18
+    hostname: postgres_telemetry_service
+    environment:
+      POSTGRES_DB: "db"
+      POSTGRES_USER: "owner"
+      POSTGRES_PASSWORD: "owner"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    ports:
+      - "5433:5433"
+    networks:
+      app-network:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U owner -d db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    volumes:
+      - postgres_telemetry_service_data:/var/lib/postgresql/data
+      - ./services/telemetries/scripts/db:/docker-entrypoint-initdb.d
+    command: -p 5433
+
+  kafka:
+    container_name: kafka
+    image: 'dh-mirror.gitverse.ru/bitnami/kafka:latest'
+    hostname: kafka
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+    networks:
+      app-network:
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CLIENT_LISTENER_NAME=EXTERNAL
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ADVERTISED_PORT=9092
+    healthcheck:
+      test: "bash -c 'printf \"\" > /dev/tcp/127.0.0.1/9092; exit $$?;'"
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  swagger-ui:
+    container_name: swagger-ui
+    image: dh-mirror.gitverse.ru/swaggerapi/swagger-ui
+    ports:
+      - "8080:8080"
+    networks:
+      app-network:
+    environment:
+      SWAGGER_JSON: /openapi.yaml
+    volumes:
+      - ./docs/api/openapi.yaml:/openapi.yaml
+
+  devices:
+    container_name: devices
+    build:
+      context: services/devices
+      dockerfile: Dockerfile
+    hostname: devices
+    ports:
+      - '8001:80'
+    networks:
+      app-network:
+    environment:
+      - KAFKA=kafka:9092
+      - POSTGRES_HOST=postgres_device_service
+      - POSTGRES_DB=db
+      - POSTGRES_USER=owner
+      - POSTGRES_PASSWORD=owner
+      - POSTGRES_PORT=5432
+      - PORT=8001
+    restart: always
+    depends_on:
+      - postgres_device_service
+      - kafka
+
+  telemetries:
+    container_name: telemetries
+    build:
+      context: services/telemetries
+      dockerfile: Dockerfile
+    hostname: telemetries
+    ports:
+      - '8002:80'
+    networks:
+      app-network:
+    environment:
+      - KAFKA=kafka:9092
+      - POSTGRES_HOST=postgres_telemetry_service
+      - POSTGRES_DB=db
+      - POSTGRES_USER=owner
+      - POSTGRES_PASSWORD=owner
+      - POSTGRES_PORT=5433
+      - PORT=8002
+    restart: always
+    depends_on:
+      - postgres_telemetry_service
+      - kafka
+
+  gateway:
+    container_name: gateway
+    build:
+      context: services/gateway
+      dockerfile: Dockerfile
+    ports:
+      - '8000:80'
+    networks:
+      app-network:
+    environment:
+      - KAFKA=kafka:9092
+      - DEVICE_SERVER=devices:8001
+      - TELEMETRY_SERVER=telemetries:8002
+    restart: always
+    depends_on:
+      - devices
+      - telemetries
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_device_service_data:
+  postgres_telemetry_service_data:

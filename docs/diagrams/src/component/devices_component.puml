@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь устройства")
+Person(device, "Устройство", "Устройство пользователя")
+System_Ext(module, "Модуль", "Модуль пользователя, который агрегирует в себе устройства и их доступ в интернет")
+
+Container(gateway, "API Gateway", "NodeJS")
+Container(queue, "Queue", "Kafka")
+
+Container_Boundary(devices, "Микросервис по управлению устройствами", "NodeJS") {
+    Component(httpController, "Контроллер для входящих запросов", "", "Обрабатывает HTTP запросы для устройств и модулей - получения их конфигурации")
+    Component(deviceController, "Контроллер для управления устройствами", "", "Сохраняет параметры устройств, модулей и возвращает новые параметры для устройств")
+    Component(queueInController, "Контроллер для записи сообщений в очередь")
+    Component(queueOutController, "Контроллер для чтения сообщений из очереди")
+
+    Rel(httpController, deviceController, "Вызов методов")
+    Rel(queueOutController, deviceController, "Вызов методов")
+    Rel(deviceController, queueInController, "Вызов методов")
+}
+
+ContainerDb(db_devices, "Data Base для устройств", "PostgreSQL", "Хранит информацию об устройствах, модулях и их параметрах")
+
+Rel(user, gateway, "Управление устройствами", "Регистрация устройств, изменение и просмотр их параметров")
+Rel(device, module, "Взаимодействие", "Подключение устройства и получение новых параметров")
+Rel(module, gateway, "Взаимодействие", "Подключение устройств и получение новых параметров")
+
+Rel(gateway, httpController, "Маршрутизация")
+Rel(gateway, queue, "Отправка запросов о регистрации устройств, изменения параметров")
+
+Rel(deviceController, db_devices, "Сохранение и чтение информации об устройствах")
+
+Rel(queueOutController, queue, "Чтение сообщений о привязывании и регистрации устройств и изменения их параметров")
+Rel(queueInController, queue, "Отправка сообщений об активации устройств")
+@enduml

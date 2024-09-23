@@ -1,0 +1,31 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь устройства")
+Person(device, "Устройство", "Устройство пользователя")
+System_Ext(module, "Модуль", "Модуль пользователя, который агрегирует в себе устройства и их доступ в интернет")
+
+Container(queue, "Queue", "Kafka")
+Container_Ext(telemetries, "Микросервис по хранение телеметрии", "NodeJS")
+Container_Ext(devices, "Микросервис по управлению устройствами", "NodeJS")
+Container_Ext(clients, "Микросервис по управлению данными клиентов", "NodeJS")
+
+Container_Boundary(gateway, "API Gateway", "NodeJS") {
+    Component(httpController, "Контроллер для входящих запросов", "", "Обрабатывает HTTP входящие запросы")
+    Component(queueInController, "Контроллер для записи сообщений в очередь")
+    Component(routeController, "Контроллер для маршрутизации запросов")
+
+    Rel(httpController, queueInController, "Вызов методов")
+    Rel(httpController, routeController, "Вызов методов")
+}
+
+Rel(user, httpController, "Управление устройствами", "Регистрация устройств, изменение и просмотр их параметров")
+Rel(device, module, "Взаимодействие", "Подключение устройства и получение новых параметров")
+Rel(module, httpController, "Взаимодействие", "Подключение устройств и получение новых параметров")
+
+Rel(routeController, telemetries, "Маршрутизация запросов чтения")
+Rel(routeController, devices, "Маршрутизация запросов чтения")
+Rel(routeController, clients, "Маршрутизация запросов чтения")
+
+Rel(queueInController, queue, "Отправка сообщений с запросами по изменению")
+@enduml

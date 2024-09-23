@@ -1,0 +1,65 @@
+@startuml
+skinparam linetype ortho
+
+entity DeviceType {
+    * id: uuid
+    --
+    * type: string
+    * default_parameters: json
+}
+
+entity Device {
+    * id: string
+    --
+    * serial_number: string
+    * name: string
+    * current_parameters: json
+    * status: bool
+    * type_id: uuid <<FK>>
+    * user_id: uuid <<FK>>
+    house_id: uuid <<FK>>
+    module_id: uuid <<FK>>
+}
+
+entity TelemetryData {
+    * id: uuid
+    --
+    * device_id: string <<FK>>
+    * indications: json
+}
+
+entity User {
+    * id: uuid
+    --
+    * login: string
+    * password: string
+    * status: bool
+}
+
+entity House {
+    * id: string
+    --
+    * name: string
+    * location: string
+    * user_id: uuid <<FK>>
+}
+
+entity Module {
+    * id: string
+    --
+    * status: bool
+    * name: string
+    * serial_number: string
+    * user_id: uuid <<FK>>
+    house_id: uuid <<FK>>
+}
+
+Device }|--|| DeviceType
+TelemetryData }|--|| Device
+Device }|--|| House
+Device }|--|| Module
+Device }|--|| User
+House }|--|| User
+Module }|--|| User
+Module }|--|| House
+@enduml

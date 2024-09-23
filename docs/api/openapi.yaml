@@ -1,0 +1,526 @@
+openapi: '3.0.0'
+info:
+  title: Microservice API
+  version: '1.0.0'
+servers:
+  - url: http://localhost:8000
+tags:
+  - name: devices
+    description: Microservice for devices
+  - name: telemetries
+    description: Microservice for telemetries
+  - name: clients
+    description: Microservice for clients
+paths:
+  /devices:
+    get:
+      tags:
+        - devices
+      summary: Get user devices
+      parameters:
+        - name: user_id
+          in: query
+          description: user ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+    post:
+      tags:
+        - devices
+      summary: Add device
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                serial_number:
+                  type: string
+                name:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - heat-checker
+                    - light-manager
+                    - door-manager
+                    - videocamera
+      responses:
+        '204':
+          description: Successful response
+        '400':
+          description: Bad request
+  /devices/{id}:
+    get:
+      tags:
+        - devices
+      summary: Get device
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Not found response
+    patch:
+      tags:
+        - devices
+      summary: Update device parameters
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                current_parameters:
+                  type: string
+                status:
+                  type: boolean
+                house_id:
+                  type: string
+                module_id:
+                  type: string
+      responses:
+        '204':
+          description: Successful response
+        '404':
+          description: Not found response
+    delete:
+      tags:
+        - devices
+      summary: Deletes a device
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful response
+        '404':
+          description: Not found response
+  /modules:
+    get:
+      tags:
+        - devices
+      summary: Get user modules
+      parameters:
+        - name: user_id
+          in: query
+          description: user ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Module'
+    post:
+      tags:
+        - devices
+      summary: Add module
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                serial_number:
+                  type: string
+                name:
+                  type: string
+      responses:
+        '204':
+          description: Successful response
+        '400':
+          description: Bad request
+  /modules/{id}:
+    get:
+      tags:
+        - devices
+      summary: Get module
+      parameters:
+        - name: id
+          in: path
+          description: ID of module
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Module'
+        '404':
+          description: Not found response
+    patch:
+      tags:
+        - devices
+      summary: Update module parameters
+      parameters:
+        - name: id
+          in: path
+          description: ID of module
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                status:
+                  type: boolean
+                house_id:
+                  type: string
+      responses:
+        '204':
+          description: Successful response
+        '404':
+          description: Not found response
+    delete:
+      tags:
+        - devices
+      summary: Deletes a module
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful response
+        '404':
+          description: Not found response
+
+  /devices/{id}/telemetries:
+    get:
+      tags:
+        - telemetries
+      summary: Get device telemetries
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TelemetryData'
+    post:
+      tags:
+        - telemetries
+      summary: Add telemetry
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                indications:
+                  type: string
+      responses:
+        '204':
+          description: Successful response
+        '404':
+          description: Not found response
+  /devices/{id}/telemetries/latest:
+    get:
+      tags:
+        - telemetries
+      summary: Get latest device telemetry
+      parameters:
+        - name: id
+          in: path
+          description: ID of device
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TelemetryData'
+
+  /user:
+    post:
+      tags:
+        - clients
+      summary: Add user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not found response
+  /user/{id}:
+    get:
+      tags:
+        - clients
+      summary: Get user
+      parameters:
+        - name: id
+          in: path
+          description: ID of user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not found response
+  /houses:
+    get:
+      tags:
+        - clients
+      summary: Get user houses
+      parameters:
+        - name: user_id
+          in: query
+          description: user ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/House'
+    post:
+      tags:
+        - clients
+      summary: Add house
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/House'
+        '400':
+          description: Bad request
+  /houses/{id}:
+    get:
+      tags:
+        - clients
+      summary: Get house
+      parameters:
+        - name: id
+          in: path
+          description: ID of house
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/House'
+        '404':
+          description: Not found response
+    patch:
+      tags:
+        - clients
+      summary: Update house
+      parameters:
+        - name: id
+          in: path
+          description: ID of house
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location:
+                  type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/House'
+        '404':
+          description: Not found response
+    delete:
+      tags:
+        - clients
+      summary: Deletes a house
+      parameters:
+        - name: id
+          in: path
+          description: ID of house
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful response
+        '404':
+          description: Not found response
+
+components:
+  schemas:
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+        serial_number:
+          type: string
+        name:
+          type: string
+        current_parameters:
+          type: string
+        status:
+          type: boolean
+        type:
+          type: string
+          enum:
+            - heat-checker
+            - light-manager
+            - door-manager
+            - videocamera
+        house_id:
+          type: string
+        module_id:
+          type: string
+    Module:
+      type: object
+      properties:
+        id:
+          type: string
+        serial_number:
+          type: string
+        name:
+          type: string
+        status:
+          type: boolean
+        house_id:
+          type: string
+    TelemetryData:
+      type: object
+      properties:
+        id:
+          type: string
+        device_id:
+          type: string
+        indications:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    House:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        location:
+          type: string

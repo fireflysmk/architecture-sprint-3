@@ -1,0 +1,36 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь", "Пользователь устройства")
+Person(device, "Устройство", "Устройство пользователя")
+System_Ext(module, "Модуль", "Модуль пользователя, который агрегирует в себе устройства и их доступ в интернет")
+
+Container(gateway, "API Gateway", "NodeJS")
+Container(queue, "Queue", "Kafka")
+
+Container_Boundary(telemetries, "Микросервис по хранение телеметрии", "NodeJS") {
+    Component(httpController, "Контроллер для входящих запросов", "", "Обрабатывает HTTP запросы для агрегации телеметрии")
+    Component(telemetriesController, "Контроллер для телеметрии устройств", "", "Сохраняет телеметрию устройств")
+    Component(telemetriesAgregationController, "Контроллер для агрегации телеметрии устройств", "", "Читает телеметрию и агрегирует ее")
+    Component(queueOutController, "Контроллер для чтения сообщений из очереди")
+
+    Rel(httpController, telemetriesController, "Вызов методов")
+    Rel(httpController, telemetriesAgregationController, "Вызов методов")
+    Rel(queueOutController, telemetriesController, "Вызов методов")
+}
+
+ContainerDb(db_telemetries, "Data Base для устройств", "PostgreSQL", "Хранит телеметрию устройств")
+
+Rel(user, gateway, "Анализ утройств", "Просмотр телеметрии устройств")
+Rel(device, module, "Взаимодействие", "Отправка телеметрии")
+Rel(module, gateway, "Взаимодействие", "Отправка телеметрии")
+
+Rel(gateway, httpController, "Маршрутизация")
+Rel(gateway, queue, "Отправка сообщений о телеметрии")
+
+Rel(telemetriesController, db_telemetries, "Сохранение телеметрии")
+
+Rel(telemetriesAgregationController, db_telemetries, "Получение телеметрии и ее агрегация")
+
+Rel(queueOutController, queue, "Чтение сообщений об активации устройств и их телеметрии")
+@enduml
