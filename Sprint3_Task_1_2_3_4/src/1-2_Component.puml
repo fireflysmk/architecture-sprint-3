@@ -1,0 +1,28 @@
+@startuml
+title Remote manage devices and monitoring telemetry in smart home
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(FitLifeSystem, "Manage devices System") {
+  Container(App, "Manage devices", "Java", "Handles user interactions")
+  Container(Database, "Database", "PostgreSQL", "Stores data")
+}
+
+Container(App, "Web Application", "Java, Spring") {
+  Component(AuthController, "AuthController", "Handles authentication and authorization")
+  Component(CommandHandlerController, "CommandHandlerController", "Command handler")
+  Component(DeviceStatusManagerController, "DeviceStatusManagerController", "Device status manager")
+  Component(ApiController, "ApiController", "API")
+  Component(ServiceLayer, "Service Layer", "Business logic")
+  Component(RepositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(AuthController,ServiceLayer,"Calls business logic")
+Rel(CommandHandlerController,ServiceLayer,"Calls business logic")
+Rel(DeviceStatusManagerController,ServiceLayer,"Calls business logic")
+Rel(ApiController,ServiceLayer,"Calls business logic")
+Rel(ServiceLayer,RepositoryLayer,"Reads/Writes data")
+Rel(RepositoryLayer,Database,"Reads/Writes data")
+@enduml

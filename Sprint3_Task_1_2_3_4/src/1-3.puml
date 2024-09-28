@@ -1,0 +1,66 @@
+@startuml
+title Remote manage devices and monitoring telemetry in smart home
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+class User {
+  +Integer id
+  +String name
+  +String email
+  +List<Membership> memberships
+  +void register()
+  +void login()
+}
+
+class House {
+  +Integer id
+  +Integer number
+  +Integer user_id
+}
+
+class Device {
+  +Integer id
+  +Integer type_id
+  +Integer house_id
+  +Integer serial_number
+  +bool status
+  +Device get_deviceinfo()
+  +Device get_status()
+  +Device set_status()
+  +Telemetry get_telemetry()
+  +void set_telemetry()
+  +Telemetry get_historytelemetry()
+}
+
+class Telemetry {
+  +Integer id
+  +Integer device_id
+  +Integer temperature
+  +Date date
+  +void get_telemetry()
+  +void set_telemetry()
+  +Integer get_temperature()
+  +void set_temperature()
+  +Telemetry get_historytelemetry()
+}
+
+class DeviceType {
+  +Integer id
+  +String name
+}
+
+class Module {
+  +Integer id
+  +Date Name
+  +Integer device_id
+}
+
+User "1" -- "0..*" House : has
+House "1" -- "0..*" Device : includes
+Device "1" -- "0..*" Telemetry : has
+DeviceType "1" -- "0..*" Device : has
+Device "1" -- "0..*" Module : has
+
+@enduml

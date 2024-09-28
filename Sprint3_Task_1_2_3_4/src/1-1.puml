@@ -1,0 +1,29 @@
+@startuml
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+title Remote manage devices and monitoring telemetry in smart home
+
+top to bottom direction
+
+Person(User, "User", "A user of the fitness club system")
+Person(Admin, "Admin", "An administrator managing the system")
+System(FitLifeSystem, "Manage devices and monitoring telemetry", "Manage devices")
+
+Container_Boundary(FitLifeSystem, "FitLife System") {
+  Container(ManageDevice, "ManageDevice", "Java", "Allows users to manage their device")
+  Container(ManageTelemetry, "ManageTelemetry", "Java", "Manage telemetry")
+  Container(Database, "Database", "PostgreSQL", "Stores user data")
+}
+
+System_Ext(ApiSensors, "Sensors", "External API for telemetry data")
+
+Rel(Admin, ManageDevice,"Manages the system")
+Rel(User, ManageTelemetry, "Uses the system")
+Rel(Admin, ManageTelemetry,"Manages the system")
+Rel(User, ManageDevice,"Manages the system")
+Rel(ManageTelemetry, Database,"Processes telemetry")
+Rel(ManageDevice,Database,"Reads/Writes user data")
+Rel(ManageTelemetry,ApiSensors,"Data telemetry")
+
+@enduml
