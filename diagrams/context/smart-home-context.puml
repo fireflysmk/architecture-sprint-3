@@ -1,0 +1,17 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(customer, "Клиент", "Пользователь системы Умный дом")
+
+System_Boundary(monolith, "Система контроля отоплением") {
+    Container(server, "Сервер", "Java Spring Backend", "Управляет логикой управления отоплением и взаимодействует с датчиками температуры в помещении")
+}
+
+System_Ext(system, "Отопительное оборудование", "Heating System")
+System_Ext(sensor, "Температурный датчик", "Temperature Sensor")
+
+Rel(customer, server, "Использует для управления отоплением")
+Rel(server, system, "Отправляет команды для управления отоплением")
+Rel(server, sensor, "Запрашивает данные о температуре в помещении")
+
+@enduml

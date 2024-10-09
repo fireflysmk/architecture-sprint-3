@@ -1,0 +1,42 @@
+@startuml
+title Умный дом Container Diagram
+
+!include <C4/C4_Container>
+
+top to bottom direction
+
+Person(user, "Пользователь", "Пользователь системы Умный дом")
+System_Boundary(system, "Система Умный дом") {
+    Container(apiGateway, "АPI Gateway", "Kusk", "Маршрутизация запросов, балансировка нагрузки, аутентификация, авторизация")
+
+    Container(Telemetry, "Telemetry", "Ведение информации поступающей с датчиков")
+    Container(Device, "Управление устройствами", "Управление отоплением, автоматическое поддержание температуры")
+    Container(User, "Управление пользователями", "Управление пользователями")
+
+    ContainerDb(telemetryDb, "База данных", "PostgreSQL")
+    ContainerDb(deviceDb, "База данных", "PostgreSQL")
+    ContainerDb(userDb, "База данных", "PostgreSQL")
+    ContainerQueue(kafka, "Шина данных", "Kafka")
+
+    Rel(apiGateway, Telemetry, "Получить телеметрию: последнюю, за период", "REST")
+    Rel(apiGateway, Device, "CRUD, вкл/выкл, выполнить команду", "REST")
+    Rel(apiGateway, User, "СRUD", "REST")
+
+    Rel(Device, kafka, "Отправляет команды")
+    Rel_L(kafka, Telemetry, "Отправляет телеметрия")
+
+    Rel(Device, deviceDb, "Чтение / запись")
+    Rel(Telemetry, telemetryDb, "Чтение / запись")
+    Rel(User, userDb, "Чтение / запись")
+
+}
+
+
+System_Ext(device, "Устройства", "API устройств", "Async API, формат данных JSON")
+
+Rel(kafka, device, "Отправляет команды")
+Rel(device, kafka, "Отправляет телеметрию")
+
+Rel(user, apiGateway, "Пользуется системой", "REST")
+
+@enduml
