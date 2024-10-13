@@ -1,0 +1,14 @@
+@startuml
+!include ./../C4_Context.puml
+
+Person(company, "Компания", "Организация удалённого управления отоплением")
+Person(homeOwner, "Клиенты", "Владельцы домов, которые пользуются системой")
+
+System(smartVillageEcoSystem, "Основное приложение(Монолит)", "Управление всей экосистемой")
+System_Ext(sensorSystem, "Датчики и реле", "Меняют температуру")
+
+Rel(homeOwner, smartVillageEcoSystem, "Пользование системой")
+Rel(smartVillageEcoSystem, sensorSystem, "Изменение датчиков")
+Rel(company, smartVillageEcoSystem, "Управление системой")
+
+@enduml

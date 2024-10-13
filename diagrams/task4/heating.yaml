@@ -1,0 +1,141 @@
+openapi: 3.0.3
+info:
+  title: Heating System API
+  description: API for managing heating systems in a smart home
+  version: 1.0.0
+servers:
+  - url: /api/heating
+    description: Base URL for the Heating System API
+paths:
+  /{id}:
+    put:
+      summary: Update a heating system
+      tags:
+        - Heating System
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the heating system to update
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Heating system details to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeatingSystemDto'
+      responses:
+        '200':
+          description: Successfully updated heating system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeatingSystemDto'
+        '400':
+          description: Invalid input
+        '404':
+          description: Heating system not found
+        '500':
+          description: Server error
+
+  /{id}/set-temperature:
+    post:
+      summary: Set target temperature for the heating system
+      tags:
+        - Heating System
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the heating system
+          schema:
+            type: integer
+            format: int64
+        - name: temperature
+          in: query
+          required: true
+          description: Target temperature to set
+          schema:
+            type: number
+            format: double
+      responses:
+        '204':
+          description: Target temperature set successfully
+        '400':
+          description: Invalid input
+        '404':
+          description: Heating system not found
+        '500':
+          description: Server error
+
+  /{id}/turn-on:
+    post:
+      summary: Turn on the heating system
+      tags:
+        - Heating System
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the heating system to turn on
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Heating system turned on successfully
+        '404':
+          description: Heating system not found
+        '500':
+          description: Server error
+
+  /{id}/turn-off:
+    post:
+      summary: Turn off the heating system
+      tags:
+        - Heating System
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the heating system to turn off
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Heating system turned off successfully
+        '404':
+          description: Heating system not found
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    HeatingSystemDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier of the heating system
+        name:
+          type: string
+          description: Name of the heating system
+        status:
+          type: string
+          enum:
+            - ON
+            - OFF
+          description: Current status of the heating system
+        targetTemperature:
+          type: number
+          format: double
+          description: Target temperature for the heating system
+        currentTemperature:
+          type: number
+          format: double
+          description: Current temperature of the heating system

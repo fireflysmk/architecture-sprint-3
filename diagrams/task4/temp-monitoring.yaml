@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: Heating System Temperature Monitoring API
+  description: API for monitoring the temperature of heating systems in a smart home
+  version: 1.0.0
+servers:
+  - url: /api/temp-monitoring
+    description: Base URL for the Temperature Monitoring API
+paths:
+  /{id}:
+    get:
+      summary: Get heating system details
+      tags:
+        - Heating System
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the heating system to retrieve
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Heating system details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeatingSystemDto'
+        '404':
+          description: Heating system not found
+        '500':
+          description: Server error
+
+  /{id}/current-temperature:
+    get:
+      summary: Get current temperature of the heating system
+      tags:
+        - Heating System
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the heating system to retrieve the current temperature from
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Current temperature retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: number
+                format: double
+        '404':
+          description: Heating system not found
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    HeatingSystemDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier of the heating system
+        name:
+          type: string
+          description: Name of the heating system
+        status:
+          type: string
+          enum:
+            - ON
+            - OFF
+          description: Current status of the heating system
+        currentTemperature:
+          type: number
+          format: double
+          description: Current temperature of the heating system

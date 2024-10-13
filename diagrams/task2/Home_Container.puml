@@ -1,0 +1,25 @@
+@startuml
+!include ./../C4_Container.puml
+
+
+Person(user, "Владелец дома", "Управляет и контролирует систему отопления через API Gateway")
+
+System_Boundary(smartVillageEcoSystem, "Экосистема умного поселка") {
+    Container(apiGateway, "API Gateway", "Nginx", "Направляет запросы пользователей в соответствующие сервисы")
+
+    Container(heatingService, "Сервис управления отоплением", "Меняет отоплене в домах")
+    Container(tempMonitoringService, "Сервис мониторинга температуры", "Читает данные о температуре в домах")
+
+       Container_Boundary(heatingSubsystem, "Подсистема управления отоплением") {
+       ContainerDb(heatingDb, "База данных", "PostgreSQL", "Хранит данные о состоянии отопления и температуре")
+
+    }
+}
+
+Rel(user, apiGateway, "Использует для управления и мониторинга системы")
+Rel(apiGateway, heatingService, "Направляет команды управления отоплением")
+Rel(apiGateway, tempMonitoringService, "Направляет запросы мониторинга температуры")
+Rel(heatingService, heatingDb, "Читает и записывает данные о состоянии отопления")
+Rel(tempMonitoringService, heatingDb, "Читает и логирует данные о температуре")
+
+@enduml

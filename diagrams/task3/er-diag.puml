@@ -1,0 +1,56 @@
+@startuml
+
+entity User {
+  * id : UUID
+  --
+  * name : String
+  * email : String
+  * password : String
+}
+
+entity House {
+  * id : UUID
+  --
+  * address : String
+  * name : String
+  * ownerId : UUID
+}
+
+entity Device {
+  * id : UUID
+  --
+  * name : String
+  * deviceTypeId : UUID
+  * houseId : UUID
+  * serial_number : UUID
+  * status : boolean
+}
+
+entity DeviceType {
+  * id : UUID
+  --
+  * typeName : String
+  * description : String
+}
+
+entity Module {
+  * id : UUID
+  --
+  * name : String
+  * deviceId : UUID
+}
+
+entity TelemetryData {
+  * id : UUID
+  --
+  * moduleId : UUID
+  * timestamp : DateTime
+  * data : String
+}
+
+User ||--o{ House : "owns"
+House ||--o{ Device : "contains"
+Device ||--|| DeviceType : "is of type"
+Device ||--o{ Module : "contains"
+Module ||--o{ TelemetryData : "collects"
+@enduml

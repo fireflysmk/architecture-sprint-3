@@ -1,0 +1,37 @@
+@startuml
+!include ./../C4_Component.puml
+
+Person(heating, "Пользователь системы отопления", "Взаимодействует с системой через веб-интерфейс")
+
+System_Boundary(c1, "Микросервисная система") {
+
+    Container(apiGateway, "API Gateway", "Nginx", "Направляет запросы пользователей в соответствующие сервисы")
+
+    Container(heatingServiceApp, "HeatingService", "Spring Boot", "Управляет данными отопления") {
+        Component(heatingController, "HeatingController", "Spring REST Controller", "Обрабатывает запросы, связанные с отоплением")
+        Component(heatingService, "HeatingService", "Spring Service", "Управляет бизнес-логикой, связанной с отоплением")
+        Component(heatingRepository, "HeatingRepository", "Spring JPA Repository", "Взаимодействует с базой данных отопления")
+    }
+
+    Container(tempMonitoringServiceApp, "TempMonitoringService", "Spring Boot", "Читает данные температур") {
+        Component(tempMonitoringController, "TempMonitoringController", "Spring REST Controller", "Обрабатывает запросы, связанные с чтением температур")
+        Component(tempMonitoringService, "TempMonitoringService", "Spring Service", "Обрабатывает бизнес-логику, связанную с чтением температур")
+        Component(tempMonitoringRepository, "TempMonitoringRepository", "Spring JPA Repository", "Взаимодействует с базой данных чтением температур")
+    }
+
+    ContainerDb(heatingDatabase, "База данных отопления", "PostgreSQL", "Хранит данные об отоплении")
+}
+
+Rel(heating, apiGateway, "Взаимодействует с Api Gateway")
+Rel(apiGateway, heatingController, "Взаимодействует с контроллером")
+Rel(heatingController, heatingService, "Использует для операций над данными отопления")
+Rel(heatingService, heatingRepository, "Использует для работы с базой данных")
+Rel(heatingRepository, heatingDatabase, "Записывает данные об отоплении")
+
+Rel(heating, apiGateway, "Мониторит температуры")
+Rel(apiGateway, tempMonitoringController, "Взаимодействует с контроллером")
+Rel(tempMonitoringController, tempMonitoringService, "Использует для чтения данных")
+Rel(tempMonitoringService, tempMonitoringRepository, "Использует для работы с базой данных")
+Rel(tempMonitoringRepository, heatingDatabase, "Читает данные")
+
+@enduml

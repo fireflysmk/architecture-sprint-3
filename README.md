@@ -1,85 +1,46 @@
-# Базовая настройка
+# Не успеваю сделать все задания, поэтому ограничюсь 1 задачнием. Видел в чате, что можно ограничется только их в 3 спринте.
 
-## Запуск minikube
+## Подзадание 1.1: Анализ и планирование
 
-[Инструкция по установке](https://minikube.sigs.k8s.io/docs/start/)
+### Описание:
+На начальном этапе система представляет из себя монолитное приложение, состоящие из 1 сервиса.
 
-```bash
-minikube start
-```
+Выделю 2 домена:
+1) Управление отоплением
+2) Мониторинг температуры
 
-## Добавление токена авторизации GitHub
+В приложении сделана стандартная трехуровневая архитектура: слой представления(контролеры), бизнес слой, слой DAO.
 
-[Получение токена](https://github.com/settings/tokens/new)
+В контроллеры сделано несколько эндпоинтов, которые упрваляют температурой, а также возвращают текущее состояние.
+В бизнес слое мало сделано логики.
+В слое DAO есть взаимодействие с 2 табличкам: heating_systems, temperature_sensors.
 
-```bash
-kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --docker-username=<github_username> --docker-password=<github_token> -n default
-```
+### Путь к описанию контекста C4 диаграммы (System Context diagram): diagrams/task1/Home_Context.puml
 
-## Установка API GW kusk
 
-[Install Kusk CLI](https://docs.kusk.io/getting-started/install-kusk-cli)
+## Подзадание 1.2: Архитектура микросервисов
 
-```bash
-kusk cluster install
-```
+Насколько я понял, задача 1 задания, это разбиение монолита на микросервисы. Не нужно ничего добавлять и придумывать.
+Поэтому не буду добавлять другие микросервисы, такие как сервис управление светом/водой/воротами, как пример.  
 
-## Смена адреса образа в helm chart
+Разобью приложение на 2 микросервиса:
+1) Управление отоплением.
+2) Мониторинг температуры.
 
-После того как вы сделали форк репозитория и у вас в репозитории отработал GitHub Action. Вам нужно получить адрес образа <https://github.com/><github_username>/architecture-sprint-3/pkgs/container/architecture-sprint-3
+Такое разбиение будет полезно, чтобы отделить изменение системы и получение текущего состояния. В какой-то степени реализуется CQRS паттерн.
+Опять же, БД будет одна, хотя одна БД для нескольких сервисов является антипаттерном.
 
-Он выглядит таким образом
-```ghcr.io/<github_username>/architecture-sprint-3:latest```
+### Путь к контейнеру: diagrams/task2/Home_Container.puml
+### Путь к компоненту: diagrams/task2/Home_Component.puml
 
-Замените адрес образа в файле `helm/smart-home-monolith/values.yaml` на полученный файл:
 
-```yaml
-image:
-  repository: ghcr.io/<github_username>/architecture-sprint-3
-  tag: latest
-```
+## Подзадание 1.3: ER-диаграмма
 
-## Настройка terraform
+### Путь к ER-диаграмме: diagrams/task3/er-diag.puml
 
-[Установите Terraform](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform)
 
-Создайте файл ~/.terraformrc
+## Подзадание 1.4: Создание и документирование API
 
-```hcl
-provider_installation {
-  network_mirror {
-    url = "https://terraform-mirror.yandexcloud.net/"
-    include = ["registry.terraform.io/*/*"]
-  }
-  direct {
-    exclude = ["registry.terraform.io/*/*"]
-  }
-}
-```
-
-## Применяем terraform конфигурацию
-
-```bash
-cd terraform
-terraform init
-terraform apply
-```
-
-## Настройка API GW
-
-```bash
-kusk deploy -i api.yaml
-```
-
-## Проверяем работоспособность
-
-```bash
-kubectl port-forward svc/kusk-gateway-envoy-fleet -n kusk-system 8080:80
-curl localhost:8080/hello
-```
-
-## Delete minikube
-
-```bash
-minikube delete
-```
+Сделал только синхронное взаимодействие:
+### Путь к первому сервису: diagrams/task4/heating.yaml
+### Путь к второму сервису: diagrams/task4/temp-monitoring.yaml
