@@ -1,0 +1,66 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+AddElementTag("microService", $shape=EightSidedShape(), $bgColor="CornflowerBlue", $fontColor="white", $legendText="micro service\neight sided")
+AddBoundaryTag("bgBlue",$bgColor="#3091ff")
+
+Person_Ext(user, "Пользователь")
+Component(apiGateway,"APIGateway")
+Component(webApplication,"WebApplication")
+
+Container_Boundary(extDevices, "Датчики и испольнительные механизмы"){
+    Component(sesorTemp, "Датчик температу")
+    Component(relayLightSwitch, "Реле Освещения")
+    Component(driverGate, "Привод ворот")
+    Component(controllerHeating, "Контроллер отопления")
+}
+
+Container_Boundary(brokerKafkaBoudary, "Брокер сообщений"){
+    Component(brokerKafka,"Kafka","Брокер для обработки сообщений")
+}
+
+Container_Boundary(msSensorsBoundary, "МС Датчики",$tags="bgBlue"){
+    Component(sensorsApi,"SensorsControllerApi","RESTApi/JSON")
+}
+
+Container_Boundary(msDriverDevicesBoundary, "МС Испольнительные механизмы",$tags="bgBlue"){
+    Component(driverDeviceApi,"DriversDevicesContolControllerApi","RESTApi/JSON")
+}
+
+Container_Boundary(msUserDataBoundary, "МС Данные пользователя",$tags="bgBlue"){
+    Component(userDataApi,"UserDataControllerApi","RESTApi/JSON")
+}
+
+Container_Boundary(msNotificationsBoundary, "МС Уведомлений",$tags="bgBlue"){
+    Component(notificationsApi,"NotificationControllerApi","RESTApi/JSON")
+}
+
+Container_Boundary(msTelemetryBoundary, "МС Уведомлений",$tags="bgBlue"){
+    Component(telemetryApi,"TelemetryControllerApi","RESTApi/JSON")
+}
+
+BiRel(brokerKafka,sensorsApi,"Обмен данными")
+BiRel(brokerKafka,driverDeviceApi,"Обмен данными")
+BiRel(brokerKafka,userDataApi,"Обмен данными")
+BiRel(brokerKafka,notificationsApi,"Обмен данными")
+BiRel(brokerKafka,telemetryApi,"Обмен данными")
+
+BiRel_U(brokerKafka,sesorTemp,"Обмен данными")
+BiRel_U(brokerKafka,relayLightSwitch,"Обмен данными")
+BiRel_U(brokerKafka,driverGate,"Обмен данными")
+BiRel_U(brokerKafka,controllerHeating,"Обмен данными")
+
+Rel_L(user, apiGateway, "HttpRequest")
+Rel(apiGateway, webApplication, "HttpRequest")
+
+
+Rel_D(webApplication, sensorsApi, "HttpRequest")
+Rel(webApplication, driverDeviceApi, "HttpRequest")
+Rel(webApplication, userDataApi, "HttpRequest")
+Rel(webApplication, telemetryApi, "HttpRequest")
+Rel(webApplication, sensorsApi, "HttpRequest")
+Rel(webApplication, sensorsApi, "HttpRequest")
+
+
+@enduml

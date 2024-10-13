@@ -1,0 +1,40 @@
+@startuml
+title Диаграмма контейнеров SmartHomeSystem
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+Person(customer, "Пользователь", "управление  'умным домом'")
+
+' System(smathome, "Smart-Home-System", "Поддержка температуры пользователя, запрос информации с внешних устройства")
+
+System_Ext(sensor, "Датчик температуры", "Установленный в доме пользователя")
+System_Ext(relayLightSwitch, "Реле света", "Установленно в доме пользователя")
+System_Ext(driverGate, "Привод ворот", "Установленно на участкепользователя")
+System_Ext(panelControl, "Панель управления отопительной системы", "Установлена в доме пользователя")
+
+' Rel(customer, smathome, "Установка, считывание, мониторинг  поддерживаемой температуры")
+' Rel(smathome, sensor, "Запрос температуры")
+' Rel(smathome, panelControl, "Запись/Чтение параметров")
+
+
+Container_Boundary(smatrHome, "Smart Home System"){    
+ Container(shAPIAppl, "API Application (Микросевисы системы)", "C# ASP.NET","REST API(HTTP/JSON)")
+ Container(shAPIGateway, "APIGateway",)
+ Container(shWebAppl, "WEB Application", "VUE.js")
+ ContainerDb(shDbPostgres, "DataBase", "postgres")
+ Container_Boundary(queueContainer, "Брокер сообщений"){
+    ContainerQueue(brokerkafka, "Kafka", "Брокер для обработки сообщений")
+  } 
+}
+
+Rel(customer, shWebAppl, "Установка, считывание, мониторинг  поддерживаемой температуры")
+Rel(shWebAppl, shAPIGateway, "HTTP Request")
+Rel(shAPIGateway, shAPIAppl, "HTTP Request")
+Rel(shAPIAppl, brokerkafka, "MessagePayload")
+Rel(brokerkafka, shAPIAppl, "MessagePayload")
+Rel(shAPIAppl, shDbPostgres, "SQL")
+BiRel(sensor, brokerkafka , "Обмен данными")
+BiRel(panelControl, brokerkafka , "Обмен данными")
+BiRel(driverGate, brokerkafka , "Обмен данными")
+BiRel(relayLightSwitch, brokerkafka , "Обмен данными")
+
+@enduml

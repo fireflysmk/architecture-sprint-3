@@ -1,0 +1,101 @@
+openapi: '3.0.0'
+info:
+  title: SmartHome API
+  version: '1.0.0'
+tags:
+  - name: device
+    description: Управление устройствами
+  - name: telemetry
+    description: Управление телеметрией
+paths:
+  /device/{device_id}:
+    get:
+      tags:
+        - device
+      summary: Получение информации об устройстве
+      description: Возвращает подробную информацию о конкретном устройстве по его ID
+      operationId: getInfoDevice
+      parameters:
+        - name: device_id
+          in: path
+          description: Ид устройства
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  type_id:
+                    type: number
+                  serila_number:
+                    type: number
+                  status: 
+                    type: number
+                  house_id:
+                    type: string
+        '404':
+          description: Устройство не найдено
+                    
+  /devices/{device_id}/status:
+    put:
+      tags:
+        - device
+      summary: Обновление состояния устройства
+      description:  Позволяет изменить состояние устройства (например, включить/выключить
+      operationId: updateDeviceStatus
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema: 
+            type: string
+      responses:
+        '201':
+          description: Успешно
+        '404':
+          description: Не найдено устройство
+          
+  /devices/{device_id}/commands:
+    get:
+      tags:
+        - device
+      summary: Отправка команды устройству
+      description:  Отправляет команду устройству (например, «установить температуру 22 градуса»)
+      parameters: 
+        - name: device_id
+          in: path
+          required: true
+          schema: 
+            type: string
+      responses:
+       '204':
+         description: Успешно
+       '404':
+         description: Устройство не найдено
+       '409':
+         description: Конфликт, устройство не может изменить состояние
+         
+  /devices/{device_id}/telemetry/latest:
+    get:
+      tags:
+        - telemetry
+      summary: Получение последних данных телеметрии
+      description: Возвращает последнее полученное значение телеметрии для устройства.
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+           type: string
+      responses:
+       '200':
+         description: Успещно
+       '404':
+         description: Устройство не найдено

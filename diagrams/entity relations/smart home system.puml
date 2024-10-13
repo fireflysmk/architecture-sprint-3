@@ -1,0 +1,57 @@
+
+@startuml
+entity "Пользователь" as user{
+ Id
+ email
+ name
+}
+
+entity "Дом"  as home{
+    idДома
+    Адрес
+    Комнаты[]
+}
+
+entity "Комната" as room {
+    idДома
+    Датчики:<Датчик>[]
+    Исп. механизмы:<Испл. механизмы>[]
+    Сценарии Телеметрии:<Телеметрия>[]
+}
+
+entity "Датчик"  as sensor{
+ id
+ idКомнаты
+ серийный номер
+ тип
+ модель
+ состояние
+}
+
+entity "Исполнительный механизм" as driver_device {
+    id
+    idКомнаты
+    серийный номер
+    тип
+    модель
+    состояние
+}
+
+entity "Сценарий(Телеметрия)" as script_telemetry{
+    idДома
+    id
+    idУстройств[]
+    idИсполМеханизм[]
+    имя
+    script выполнение
+}
+
+user ||..o{ home
+home ||..o{ script_telemetry
+home ||..o{ room
+room ||..o{ sensor
+room ||..o{ driver_device
+sensor }|..|{ script_telemetry
+driver_device }|..|{ script_telemetry
+
+@enduml
