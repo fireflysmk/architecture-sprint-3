@@ -1,0 +1,15 @@
+@startuml
+package "Device Management Service" {
+  component DeviceAPI
+  component CommandHandler
+  component DeviceStateManager
+  component EventPublisher
+}
+
+DeviceAPI -> CommandHandler : "Запрос на включение/выключение устройства"
+CommandHandler -> DeviceStateManager : "Изменение состояния устройства"
+DeviceStateManager -> DeviceManagementDB : "Обновление состояния устройства в БД"
+DeviceStateManager -> EventPublisher : "Публикация события об изменении состояния"
+EventPublisher -> Kafka : "Отправка события в кафку"
+
+@enduml

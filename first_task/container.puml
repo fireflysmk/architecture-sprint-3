@@ -1,0 +1,39 @@
+@startuml
+
+package "Микросервисы" {
+  component TemperatureMonitoringService
+  component TemperatureRegulationService
+  component DeviceManagementService
+  component NotificationService
+}
+
+package "Базы данных" {
+  database TempMonitoringDB
+  database TempRegulationDB
+  database DeviceManagementDB
+  database NotificationDB
+}
+
+package "Шина" {
+  queue Kafka as "Топик"
+}
+
+API_Gateway -> TemperatureMonitoringService : "Запрос текущей температуры"
+TemperatureMonitoringService -> TempMonitoringDB : "Чтение температуры"
+TemperatureMonitoringService -> Kafka : "Публикация данных о температуре"
+
+API_Gateway -> TemperatureRegulationService : "Команды регулирования температуры"
+TemperatureRegulationService -> TempRegulationDB : "Запись настроек"
+TemperatureRegulationService -> DeviceManagementService : "Команды управления устройствами"
+
+API_Gateway -> DeviceManagementService : "Управление устройствами (включение/выключение)"
+DeviceManagementService -> DeviceManagementDB : "Запись состояния устройства"
+DeviceManagementService -> Kafka : "Публикация изменений состояния"
+
+TemperatureRegulationService -> Kafka : "Публикация команд"
+
+Kafka -> NotificationService : "События для уведомлений"
+NotificationService -> NotificationDB : "Логи уведомлений"
+NotificationService -> User : "Отправка уведомлений"
+
+@enduml
