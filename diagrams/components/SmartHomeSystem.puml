@@ -9,6 +9,8 @@ Person_Ext(user, "Пользователь")
 Component(apiGateway,"APIGateway")
 Component(webApplication,"WebApplication")
 
+' Внешние устройства для управления
+
 Container_Boundary(extDevices, "Датчики и испольнительные механизмы"){
     Component(sesorTemp, "Датчик температу")
     Component(relayLightSwitch, "Реле Освещения")
@@ -16,40 +18,98 @@ Container_Boundary(extDevices, "Датчики и испольнительные
     Component(controllerHeating, "Контроллер отопления")
 }
 
+
+'KAFKA Брокер сообщений
 Container_Boundary(brokerKafkaBoudary, "Брокер сообщений"){
     Component(brokerKafka,"Kafka","Брокер для обработки сообщений")
 }
 
+BiRel_U(sesorTemp,brokerKafka,"Обмен данными")
+BiRel_U(relayLightSwitch,brokerKafka,"Обмен данными")
+BiRel_U(driverGate,brokerKafka,"Обмен данными")
+BiRel_U(controllerHeating,brokerKafka,"Обмен данными")
+
+
+'сервис Датчики
 Container_Boundary(msSensorsBoundary, "МС Датчики",$tags="bgBlue"){
     Component(sensorsApi,"SensorsControllerApi","RESTApi/JSON")
+    ComponentDb(sensorDb, "DataBase", "Postgres")
+    Component(sensorService, "Сервис управления устройствами", ".net")
+    Component(sensorKafkaHandler, "Обработчик Ассинх сообщений", ".net")
 }
 
+BiRel(sensorsApi,sensorService,"API")
+BiRel(sensorService,sensorDb,"Sql Команды")
+BiRel(sensorKafkaHandler,sensorDb,"Sql команды")
+BiRel(sensorKafkaHandler,sensorService,"API")
+BiRel(brokerKafka,sensorKafkaHandler,"Обмен данными")
+
+
+
+' сервиc Испольнительные механизмы
 Container_Boundary(msDriverDevicesBoundary, "МС Испольнительные механизмы",$tags="bgBlue"){
     Component(driverDeviceApi,"DriversDevicesContolControllerApi","RESTApi/JSON")
+    ComponentDb(driverDeviceDB,"DataBase","Postgres")
+    Component(driverDeviceService,"Сервис упрвления Испол-ми механизмами",".net")
+    Component(driverDeviceKafkaHandler,"Обрботчик Ассинх. сообщений",".net")
 }
 
+BiRel(driverDeviceApi,driverDeviceService,"API")
+BiRel(driverDeviceService, driverDeviceDB, "SQL")
+BiRel(driverDeviceKafkaHandler,driverDeviceDB,"SQL")
+BiRel(driverDeviceKafkaHandler,driverDeviceService,"API")
+BiRel(driverDeviceKafkaHandler,brokerKafka,"Обмен Данными")
+
+
+
+' сервис управления пользователями
 Container_Boundary(msUserDataBoundary, "МС Данные пользователя",$tags="bgBlue"){
     Component(userDataApi,"UserDataControllerApi","RESTApi/JSON")
+    ComponentDb(userDataDd,"DataBase","Postgres")
+    Component(userDataService,"Сервис управления пользователями",".net")
+    Component(userDataKafkaHandler,"Обработчик Ассинх. сообщений",".net")
 }
 
+BiRel(brokerKafka,userDataKafkaHandler,"Обмен данными")
+BiRel(userDataApi,userDataService,"API")
+BiRel(userDataService,userDataDd,"SQL")
+BiRel(userDataKafkaHandler, userDataDd,"SQL")
+BiRel(userDataKafkaHandler, userDataService,"API")
+
+
+
+'сервис уведомлений
 Container_Boundary(msNotificationsBoundary, "МС Уведомлений",$tags="bgBlue"){
     Component(notificationsApi,"NotificationControllerApi","RESTApi/JSON")
+    Component(notificationsDB,"DataBase","Postgres")
+    Component(notificationsService,"Сервис управления уведомлениями",".net")
+    Component(notificationsKafkaHandler,"Обработчи Ассинх. событий",".net")
 }
 
-Container_Boundary(msTelemetryBoundary, "МС Уведомлений",$tags="bgBlue"){
+BiRel(brokerKafka,notificationsKafkaHandler,"Обмен данными")
+BiRel(notificationsApi,notificationsService,"API")
+BiRel(notificationsService, notificationsDB,"SQL")
+BiRel(notificationsKafkaHandler, notificationsDB,"SQL")
+BiRel(notificationsKafkaHandler, notificationsService,"API")
+
+
+
+' сервис телеметрии
+Container_Boundary(msTelemetryBoundary, "МС Телеметрии",$tags="bgBlue"){
     Component(telemetryApi,"TelemetryControllerApi","RESTApi/JSON")
+    ComponentDb(telemetryDB,"DataBase","Postgres")
+    Component(telemetryService,"Сервис управления телеметрией",".net")
+    Component(telemetryKafkaHandler,"Обработчик Ассинх. сообщений",".net")
 }
 
-BiRel(brokerKafka,sensorsApi,"Обмен данными")
-BiRel(brokerKafka,driverDeviceApi,"Обмен данными")
-BiRel(brokerKafka,userDataApi,"Обмен данными")
-BiRel(brokerKafka,notificationsApi,"Обмен данными")
-BiRel(brokerKafka,telemetryApi,"Обмен данными")
+BiRel(brokerKafka,telemetryKafkaHandler,"Обмен данными")
+BiRel(telemetryApi,telemetryService,"API")
+BiRel(telemetryService,telemetryDB,"SQL")
+BiRel(telemetryKafkaHandler,telemetryDB,"SQL")
+BiRel(telemetryKafkaHandler,telemetryService,"API")
 
-BiRel_U(brokerKafka,sesorTemp,"Обмен данными")
-BiRel_U(brokerKafka,relayLightSwitch,"Обмен данными")
-BiRel_U(brokerKafka,driverGate,"Обмен данными")
-BiRel_U(brokerKafka,controllerHeating,"Обмен данными")
+
+
 
 Rel_L(user, apiGateway, "HttpRequest")
 Rel(apiGateway, webApplication, "HttpRequest")
@@ -59,8 +119,5 @@ Rel_D(webApplication, sensorsApi, "HttpRequest")
 Rel(webApplication, driverDeviceApi, "HttpRequest")
 Rel(webApplication, userDataApi, "HttpRequest")
 Rel(webApplication, telemetryApi, "HttpRequest")
-Rel(webApplication, sensorsApi, "HttpRequest")
-Rel(webApplication, sensorsApi, "HttpRequest")
-
 
 @enduml
