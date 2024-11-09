@@ -1,0 +1,23 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+title Диаграмма компонентов для Device Management Service
+
+Container_Boundary(deviceService, "Device Management Service", $tags="") {
+    Component(deviceService.APIController, "API Controller", $techn="Ruby on Rails", $descr="Обработка API запросов")
+    Component(deviceService.DeviceRegistry, "Device Registry", $techn="Ruby", $descr="Регистрация и управление устройствами")
+    Component(deviceService.DeviceProvisioner, "Device Provisioner", $techn="Ruby", $descr="Настройка и подключение устройств")
+    Component(deviceService.DeviceDBAccess, "Device DB Access", $techn="Ruby", $descr="Доступ к базе данных устройств")
+}
+
+ContainerDb(deviceDb, "Device DB", $techn="MongoDB", $descr="Данные устройств")
+
+Rel(deviceService.APIController, deviceService.DeviceRegistry, "Передает запросы управления устройствами")
+Rel(deviceService.DeviceRegistry, deviceService.DeviceProvisioner, "Выполняет настройку устройств")
+Rel(deviceService.DeviceRegistry, deviceService.DeviceDBAccess, "Читает и записывает данные устройств")
+Rel(deviceService.DeviceDBAccess, deviceDb, "Читает и пишет", $techn="MongoDB Protocol")
+
+@enduml

@@ -1,0 +1,54 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title UML-диаграмма классов для Scenario Manager
+
+class ScenarioManager {
+    +createScenario(scenario: Scenario): UUID
+    +updateScenario(scenarioId: UUID, scenario: Scenario): void
+    +deleteScenario(scenarioId: UUID): void
+    +executeScenario(scenarioId: UUID): void
+    +getScenario(scenarioId: UUID): Scenario
+}
+
+class Scenario {
+    -id: UUID
+    -name: string
+    -description: string
+    -triggers: List<Trigger>
+    -actions: List<Action>
+}
+
+class Trigger {
+    -id: UUID
+    -type: TriggerType
+    -parameters: Map<String, Object>
+    +evaluate(): boolean
+}
+
+class Action {
+    -id: UUID
+    -type: ActionType
+    -parameters: Map<String, Object>
+    +execute(): void
+}
+
+enum TriggerType {
+    TIME,
+    EVENT,
+    CONDITION
+}
+
+enum ActionType {
+    DEVICE_CONTROL,
+    NOTIFICATION,
+    SCENARIO_EXECUTION
+}
+
+ScenarioManager o-- Scenario : "управляет"
+Scenario *-- Trigger : "содержит"
+Scenario *-- Action : "содержит"
+Trigger ..> TriggerType
+Action ..> ActionType
+
+@enduml

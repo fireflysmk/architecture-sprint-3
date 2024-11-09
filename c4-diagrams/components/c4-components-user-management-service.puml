@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+title Диаграмма компонентов для User Management Service
+
+Container_Boundary(userService, "User Management Service", $tags="") {
+    Component(userService.APIController, "API Controller", $techn="Java Spring", $descr="Обработка API запросов")
+    Component(userService.AuthManager, "Authentication Manager", $techn="Java", $descr="Аутентификация пользователей")
+    Component(userService.UserManager, "User Manager", $techn="Java", $descr="Управление учетными записями пользователей")
+    Component(userService.RoleManager, "Role Manager", $techn="Java", $descr="Управление ролями и правами доступа")
+    Component(userService.UserDBAccess, "User DB Access", $techn="Java", $descr="Доступ к базе данных пользователей")
+}
+
+ContainerDb(userDb, "User DB", $techn="PostgreSQL", $descr="Данные пользователей и ролей")
+
+Rel(userService.APIController, userService.AuthManager, "Передает запросы аутентификации")
+Rel(userService.APIController, userService.UserManager, "Передает запросы управления пользователями")
+Rel(userService.APIController, userService.RoleManager, "Передает запросы управления ролями")
+Rel(userService.AuthManager, userService.UserDBAccess, "Читает данные пользователей")
+Rel(userService.UserManager, userService.UserDBAccess, "Читает и записывает данные пользователей")
+Rel(userService.RoleManager, userService.UserDBAccess, "Читает и записывает данные ролей")
+Rel(userService.UserDBAccess, userDb, "Читает и пишет", $techn="SQL/TCP")
+
+@enduml

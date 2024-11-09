@@ -1,0 +1,78 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+title UML-диаграмма классов для DeviceCommunicator
+
+class DeviceCommunicator {
+    +sendCommand(deviceId: UUID, command: Command): Response
+    +receiveStatus(deviceId: UUID): DeviceStatus
+    -protocolHandlers: Map<ProtocolType, ProtocolHandler>
+}
+
+interface ProtocolHandler {
+    +sendCommand(device: Device, command: Command): Response
+    +receiveStatus(device: Device): DeviceStatus
+}
+
+class Device {
+    -id: UUID
+    -type: DeviceType
+    -protocol: ProtocolType
+    -address: string
+}
+
+class Command {
+    -type: CommandType
+    -parameters: Map<String, Object>
+}
+
+class Response {
+    -status: ResponseStatus
+    -data: Map<String, Object>
+}
+
+enum ProtocolType {
+    MQTT,
+    HTTP,
+    CoAP
+}
+
+enum CommandType {
+    TURN_ON,
+    TURN_OFF,
+    SET_TEMPERATURE,
+    GET_STATUS
+}
+
+enum ResponseStatus {
+    SUCCESS,
+    FAILURE,
+    TIMEOUT
+}
+
+DeviceCommunicator o-- Device : "взаимодействует с"
+DeviceCommunicator --> ProtocolHandler : "использует"
+Device ..> ProtocolType
+Command ..> CommandType
+Response ..> ResponseStatus
+
+ProtocolHandler <|.. MqttProtocolHandler
+ProtocolHandler <|.. HttpProtocolHandler
+ProtocolHandler <|.. CoapProtocolHandler
+
+class MqttProtocolHandler {
+    +sendCommand(device: Device, command: Command): Response
+    +receiveStatus(device: Device): DeviceStatus
+}
+
+class HttpProtocolHandler {
+    +sendCommand(device: Device, command: Command): Response
+    +receiveStatus(device: Device): DeviceStatus
+}
+
+class CoapProtocolHandler {
+    +sendCommand(device: Device, command: Command): Response
+    +receiveStatus(device: Device): DeviceStatus
+}
+
+@enduml

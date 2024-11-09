@@ -1,0 +1,26 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+title Компонентная диаграмма для Lighting Control Service
+
+Container_Boundary(lightingService, "Lighting Control Service", $tags="") {
+    Component(lightingService.APIController, "API Controller", $techn="Node.js Express", $descr="Обработка API запросов")
+    Component(lightingService.LightingManager, "Lighting Manager", $techn="Node.js", $descr="Управление системами освещения")
+    Component(lightingService.DeviceCommunicator, "Device Communicator", $techn="Node.js", $descr="Взаимодействие с устройствами освещения")
+    Component(lightingService.EventPublisher, "Event Publisher", $techn="Node.js", $descr="Публикация событий в Kafka")
+}
+
+Container_Ext(lightDevices, "Lighting Devices", $techn="Embedded Systems", $descr="Устройства освещения, управляемые системой")
+
+Container(kafka, "Kafka", $techn="Apache Kafka", $descr="Шина данных")
+
+Rel(lightingService.APIController, lightingService.LightingManager, "Передает команды управления освещением")
+Rel(lightingService.LightingManager, lightingService.DeviceCommunicator, "Отправляет команды устройствам")
+Rel(lightingService.DeviceCommunicator, lightDevices, "Обменивается данными с устройствами", $techn="HTTP/MQTT")
+Rel(lightingService.LightingManager, lightingService.EventPublisher, "Отправляет события")
+Rel(lightingService.EventPublisher, kafka, "Публикует события", $techn="Kafka Protocol")
+
+@enduml

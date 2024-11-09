@@ -1,0 +1,50 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+title Диаграмма контейнеров для новой микросервисной архитектуры
+
+Person(user, "Пользователь", "Управляет умным домом через приложение")
+
+Container(clientApp, "Клиентское приложение", "iOS/Android/Web", "Интерфейс пользователя")
+Container(apiGateway, "API Gateway", "Nginx/Express", "Маршрутизация и аутентификация")
+
+System_Boundary(microservices, "Микросервисы") {
+    Container(userService, "User Management Service", "Java", "Аутентификация и авторизация")
+    Container(heatingService, "Heating Control Service", "Java", "Управление отоплением")
+    Container(tempService, "Temperature Monitoring Service", "Python", "Мониторинг температуры")
+    Container(lightingService, "Lighting Control Service", "Node.js", "Управление освещением")
+    Container(accessService, "Access Control Service", "Go", "Контроль доступа")
+    Container(surveillanceService, "Surveillance Service", "C#", "Наблюдение")
+    Container(deviceService, "Device Management Service", "Ruby", "Управление устройствами")
+    Container(automationService, "Automation Service", "Python", "Автоматизация сценариев")
+}
+
+ContainerDb(userDb, "User DB", "PostgreSQL", "Данные пользователей")
+ContainerDb(deviceDb, "Device DB", "MongoDB", "Данные устройств")
+ContainerDb(automationDb, "Automation DB", "PostgreSQL", "Сценарии автоматизации")
+
+Container(kafka, "Kafka", "Apache Kafka", "Шина данных")
+
+Rel(user, clientApp, "Использует")
+Rel(clientApp, apiGateway, "Отправляет запросы", "HTTPS")
+Rel(apiGateway, userService, "Маршрутизирует для аутентификации", "HTTPS")
+Rel(apiGateway, heatingService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, tempService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, lightingService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, accessService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, surveillanceService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, deviceService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, automationService, "Маршрутизирует", "HTTPS")
+
+Rel(userService, userDb, "Читает и пишет", "JDBC")
+Rel(deviceService, deviceDb, "Читает и пишет", "MongoDB Protocol")
+Rel(automationService, automationDb, "Читает и пишет", "JDBC")
+
+Rel(heatingService, kafka, "Публикует и подписывается на события", "Kafka Protocol")
+Rel(tempService, kafka, "Публикует данные", "Kafka Protocol")
+Rel(automationService, kafka, "Подписывается на события", "Kafka Protocol")
+
+@enduml
