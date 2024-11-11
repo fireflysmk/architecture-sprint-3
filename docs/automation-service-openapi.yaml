@@ -1,0 +1,229 @@
+openapi: 3.1.1
+info:
+  title: Automation Service API
+  version: '1.0.0'
+  description: API for creating and managing automation scenarios in the smart home ecosystem from WarmHome Inc.
+servers:
+  - url: 'https://api.warm-home.com/automation'
+    description: Production server
+  - url: 'https://api-dev.warm-home.com/automation'
+    description: Development server
+paths:
+  /scenarios:
+    post:
+      summary: Create a new automation scenario
+      operationId: createScenario
+      requestBody:
+        description: Scenario to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioCreateRequest'
+      responses:
+        '201':
+          description: Scenario created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioCreateResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /scenarios/{scenarioId}/execute:
+    post:
+      summary: Execute a scenario manually
+      operationId: executeScenario
+      parameters:
+        - name: scenarioId
+          in: path
+          description: ID of the scenario to execute
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Scenario execution started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioExecuteResponse'
+        '404':
+          description: Scenario not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/{userId}/scenarios:
+    get:
+      summary: Get scenarios created by a user
+      operationId: getUserScenarios
+      parameters:
+        - name: userId
+          in: path
+          description: ID of the user
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of user's scenarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScenarioSummary'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ScenarioCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the scenario
+        description:
+          type: string
+          description: Description of the scenario
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trigger'
+          description: List of triggers
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Action'
+          description: List of actions
+      required:
+        - name
+        - triggers
+        - actions
+    ScenarioCreateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Confirmation message
+        scenarioId:
+          type: string
+          format: uuid
+          description: Identifier of the created scenario
+      required:
+        - message
+        - scenarioId
+    ScenarioExecuteResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Confirmation message
+        scenarioId:
+          type: string
+          format: uuid
+          description: Identifier of the executed scenario
+      required:
+        - message
+        - scenarioId
+    ScenarioSummary:
+      type: object
+      properties:
+        scenarioId:
+          type: string
+          format: uuid
+          description: Identifier of the scenario
+        name:
+          type: string
+          description: Name of the scenario
+        description:
+          type: string
+          description: Description of the scenario
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the scenario was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of the last update to the scenario
+      required:
+        - scenarioId
+        - name
+    Trigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of the trigger (e.g., TIME, EVENT)
+          enum:
+            - TIME
+            - EVENT
+            - CONDITION
+        parameters:
+          type: object
+          description: Parameters specific to the trigger type
+          additionalProperties:
+            type: string
+      required:
+        - type
+        - parameters
+    Action:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of the action (e.g., DEVICE_CONTROL)
+          enum:
+            - DEVICE_CONTROL
+            - NOTIFICATION
+            - SCENARIO_EXECUTION
+        parameters:
+          type: object
+          description: Parameters specific to the action type
+          additionalProperties:
+            type: string
+      required:
+        - type
+        - parameters
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+        message:
+          type: string
+          description: Error message
+      required:
+        - code
+        - message

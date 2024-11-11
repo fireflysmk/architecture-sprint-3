@@ -1,0 +1,249 @@
+openapi: 3.1.1
+info:
+  title: Device Management API
+  version: '1.0.0'
+  description: API for managing devices in the smart home ecosystem from WarmHome Inc.
+servers:
+  - url: 'https://api.warm-home.com/device-management'
+    description: Production server
+  - url: 'https://api-dev.warm-home.com/device-management'
+    description: Development server
+paths:
+  /devices/{deviceId}:
+    get:
+      summary: Get device information
+      operationId: getDevice
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to retrieve
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Device information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /devices/{deviceId}/status:
+    put:
+      summary: Update device status
+      operationId: updateDeviceStatus
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to update
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: New status for the device
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceStatusUpdateRequest'
+      responses:
+        '200':
+          description: Device status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceStatusUpdateResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /devices/{deviceId}/commands:
+    post:
+      summary: Send command to device
+      operationId: sendDeviceCommand
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID of the device to send the command to
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Command to send to the device
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCommandRequest'
+      responses:
+        '202':
+          description: Command accepted and will be processed asynchronously
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceCommandResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier of the device
+        name:
+          type: string
+          description: User-defined name of the device
+        deviceType:
+          type: string
+          description: Type of the device (e.g., Thermostat, Camera)
+        status:
+          type: string
+          description: Current status of the device
+          enum:
+            - active
+            - inactive
+            - error
+        serialNumber:
+          type: string
+          description: Manufacturer's serial number of the device
+        roomId:
+          type: string
+          format: uuid
+          description: Identifier of the room where the device is located
+        houseId:
+          type: string
+          format: uuid
+          description: Identifier of the house where the device is located
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the device was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of the last update to the device
+      required:
+        - id
+        - name
+        - deviceType
+        - status
+    DeviceStatusUpdateRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          description: New status of the device
+          enum:
+            - active
+            - inactive
+            - error
+      required:
+        - status
+    DeviceStatusUpdateResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Confirmation message
+        deviceId:
+          type: string
+          format: uuid
+          description: Identifier of the updated device
+        status:
+          type: string
+          description: Updated status of the device
+      required:
+        - message
+        - deviceId
+        - status
+    DeviceCommandRequest:
+      type: object
+      properties:
+        commandType:
+          type: string
+          description: Type of command to send (e.g., SET_TEMPERATURE)
+        parameters:
+          type: object
+          description: Parameters for the command
+          additionalProperties:
+            type: string
+      required:
+        - commandType
+    DeviceCommandResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Confirmation message
+        deviceId:
+          type: string
+          format: uuid
+          description: Identifier of the device
+        commandId:
+          type: string
+          format: uuid
+          description: Identifier of the command for tracking
+      required:
+        - message
+        - deviceId
+        - commandId
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+        message:
+          type: string
+          description: Error message
+      required:
+        - code
+        - message
