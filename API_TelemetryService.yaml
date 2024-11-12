@@ -1,0 +1,32 @@
+asyncapi: 2.0.0
+info:
+  title: Telemetry Service
+  description: Асинхронный API для передачи данных телеметрии через Kafka
+  version: 1.0.0
+
+channels:
+  telemetry/temperature:
+    description: Канал передачи данных о температуре с устройств
+    subscribe:
+      summary: Принимает данные телеметрии о температуре
+      operationId: receiveTemperatureData
+      message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            device_id:
+              type: string
+              description: Уникальный идентификатор устройства
+              example: "device123"
+            timestamp:
+              type: string
+              format: date-time
+              description: Метка времени измерения
+              example: "2023-01-01T12:00:00Z"
+            temperature:
+              type: number
+              description: Значение температуры
+              example: 22.5
+
+

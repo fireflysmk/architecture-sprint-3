@@ -1,0 +1,39 @@
+openapi: 3.0.0
+info:
+  title: User Service API
+  description: API для управления пользователями в экосистеме умного дома
+  version: 1.0.0
+
+paths:
+  /users:
+    post:
+      summary: Создание нового пользователя
+      description: Создаёт новый профиль пользователя.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  example: "john.doe@example.com"
+                password:
+                  type: string
+                  example: "securePassword123"
+              required:
+                - email
+                - password
+      responses:
+        201:
+          description: Успешное создание пользователя
+        400:
+          description: Ошибка валидации запроса
+        500:
+          description: Внутренняя ошибка сервера
+
+

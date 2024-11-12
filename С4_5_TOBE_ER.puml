@@ -1,0 +1,56 @@
+@startuml
+entity "User" as U {
+    *id: ID [PK]
+    --
+    name: String
+    email: String
+    password: String
+    created_at: DateTime
+}
+
+entity "House" as H {
+    *id: ID [PK]
+    --
+    address: String
+    user_id: ID 
+}
+
+entity "Device" as D {
+    *id: ID [PK]
+    --
+    serial_number: String
+    status: String
+    last_activity: DateTime
+    type_id: ID
+    house_id: ID 
+}
+
+entity "DeviceType" as DT {
+    *id: ID [PK]
+    --
+    name: String
+    description: String
+}
+
+entity "Module" as M {
+    *id: ID [PK]
+    --
+    name: String
+    config: String
+    device_id: ID
+}
+
+entity "TelemetryData" as T {
+    *id: ID [PK]
+    --
+    timestamp: DateTime
+    data: String
+    device_id: ID
+}
+
+U ||--o{ H : "owns"
+H ||--o{ D : "contains"
+D ||--o{ M : "has"
+D ||--o{ T : "generates"
+D }o--|| DT : "is of type"
+@enduml

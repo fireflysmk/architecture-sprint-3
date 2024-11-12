@@ -1,0 +1,18 @@
+@startuml
+!theme bluegray
+!define RECTANGLE #dddddd
+!define CIRCLE #8dd3c7
+
+actor User
+participant "API Gateway" as APIGW
+participant "Device Management Service" as DMS
+participant "Database" as DB RECTANGLE
+participant "Kafka" as Kafka CIRCLE
+
+User -> APIGW : Add New Device
+APIGW -> DMS : POST /devices
+DMS -> DB : Insert Device Data
+DMS -> Kafka : Publish "DeviceAdded" Event
+DMS -> APIGW : Response (Device Added)
+APIGW -> User : Device Added Successfully
+@enduml

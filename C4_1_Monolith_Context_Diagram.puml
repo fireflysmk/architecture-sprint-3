@@ -1,0 +1,11 @@
+@startuml
+!define RECTANGLE #dddddd
+!define CIRCLE #8dd3c7
+
+rectangle "Пользователь" as User RECTANGLE
+rectangle "Монолитное Приложение" as Monolith RECTANGLE
+rectangle "Датчик Температуры" as TemperatureSensor RECTANGLE
+
+User -down-> Monolith : Включение/выключение отопления\nЗапрос температуры
+Monolith -down-> TemperatureSensor : Запрос данных о температуре
+@enduml
