@@ -1,13 +1,7 @@
 {
-	"folders": [
-		{
-			"name": "architecture-sprint-3.2",
-			"path": "."
-		},
-		{
-			"name": "C4",
-			"path": "../architecture-sprint-3/C4"
-		}
-	],
-	"settings": {}
+    "folders": [
+        {
+            "path": "."
+        }
+    ]
 }

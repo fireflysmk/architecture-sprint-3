@@ -1,48 +1,9 @@
 @startuml
-title Device Management System Component Diagram
-
-top to bottom direction
-
-!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
-
-Container_Boundary(System, "Device Management System") {
-  Container(API_Gateway, "API Gateway", "Kong", "Единый вход для клиентских запросов, маршрутизирует их к микросервисам")
-  Container(Kafka, "Message Broker (Kafka)", "Apache Kafka", "Асинхронная передача сообщений данных о температуре и состоянии устройств")
-
-  Container(HeatingControlService, "Heating Control Service", "Java", "Управляет приборами отопления")
-  Container(TemperatureMonitoringService, "Temperature Monitoring Service", "Java", "Получает и сохраняет данные о температуре")
-  Container(DeviceManagementService, "Device Management Service", "Java", "Управление устройствами")
-  Container(UserManagementService, "User Management Service", "Java", "Регистрация, аутентификация и авторизация пользователей")
-  Container(NotificationService, "Notification Service", "Java", "Отправка уведомлений (email, SMS, push)")
-  Container(ScenarioManagementService, "Scenario Management Service", "Go", "Создание и управление пользовательскими сценариями автоматизации")
-  Container(LoggingMonitoringService, "Logging & Monitoring Service", "ELK Stack", "Логирование и мониторинг")
-  
-  ContainerDb(UserDB, "User Database", "PostgreSQL", "Авторизационные данные пользователей")
-  ContainerDb(TemperatureDB, "Temperature Database", "MongoDB", "Температура и дата/время")
-  ContainerDb(DeviceDB, "Device Database", "MySQL", "Конфигурация устройств и состояние")
-  ContainerDb(ScenarioDB, "Scenario Database", "PostgreSQL", "Пользовательские сценарии автоматизации")
-  ContainerDb(LogsDB, "Logs Database", "Elasticsearch", "Логи/события")
+!theme bluegray
+package "Device Management Service" {
+    [API Component] --> [Command Handler] : Handles Commands
+    [Command Handler] --> [Device State Manager] : Updates Device States
+    [Command Handler] --> [Event Publisher] : Publishes Events
+    [Device State Manager] --> Database : Stores Device Data
 }
-
-' Взаимодействия
-Rel(API_Gateway, HeatingControlService, "Запрос на управление отоплением")
-Rel(API_Gateway, TemperatureMonitoringService, "Запрос на получение температурных данных")
-Rel(API_Gateway, DeviceManagementService, "Запрос на управление устройством")
-Rel(API_Gateway, UserManagementService, "Запрос на авторизацию")
-Rel(API_Gateway, NotificationService, "Запрос на отправку уведомления")
-Rel(API_Gateway, ScenarioManagementService, "Запрос на управление сценарием")
-
-Rel(TemperatureMonitoringService, Kafka, "Публикует данные о температуре")
-Rel(DeviceManagementService, Kafka, "Публикует события подключенных устройств")
-Rel(Kafka, HeatingControlService, "Подписка на события с данными о температуре")
-Rel(Kafka, NotificationService, "Подписча на события и состояние устройств")
-
-Rel(UserManagementService, UserDB, "Чтение и запись пользовательских данных")
-Rel(TemperatureMonitoringService, TemperatureDB, "Хранение истории о температуре")
-Rel(DeviceManagementService, DeviceDB, "Хранение конфигурации устройств")
-Rel(ScenarioManagementService, ScenarioDB, "Хранение пользовательских сценариев автоматизации")
-Rel(LoggingMonitoringService, LogsDB, "Хранение логов/событий")
-
-' Уведомления пользователю
-Rel(NotificationService, User, "Отправка email, SMS и push уведомлений")
 @enduml

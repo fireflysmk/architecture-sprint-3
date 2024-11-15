@@ -1,0 +1,85 @@
+openapi: 3.0.0
+info:
+  title: Scenario Management Service
+  version: 1.0.0
+paths:
+  /scenarios/create:
+    post:
+      summary: Создать новый сценарий автоматизации
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                trigger:
+                  type: string
+                  description: Условие для запуска сценария (например, "открытие двери")
+                action:
+                  type: string
+                  description: Действие для выполнения (например, "включить свет")
+      responses:
+        '200':
+          description: Scenario created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  scenarioId:
+                    type: string
+
+  /scenarios/delete:
+    delete:
+      summary: Удалить существующий сценарий
+      parameters:
+        - name: scenarioId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID сценария, который нужно удалить
+      responses:
+        '200':
+          description: Scenario deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /scenarios/list:
+    get:
+      summary: Получить список сценариев пользователя
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of user scenarios
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  scenarios:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        scenarioId:
+                          type: string
+                        trigger:
+                          type: string
+                        action:
+                          type: string

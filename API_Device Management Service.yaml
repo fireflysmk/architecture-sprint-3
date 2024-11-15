@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: Device Management Service
+  version: 1.0.0
+paths:
+  /devices/add:
+    post:
+      summary: Добавить новое устройство
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceId:
+                  type: string
+                type:
+                  type: string
+                location:
+                  type: string
+      responses:
+        '200':
+          description: Device added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /devices/remove:
+    post:
+      summary: Удалить устройство
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceId:
+                  type: string
+      responses:
+        '200':
+          description: Device removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /devices/list:
+    get:
+      summary: Получить список подключенных устройств
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of devices
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        deviceId:
+                          type: string
+                        type:
+                          type: string
+                        location:
+                          type: string
+
