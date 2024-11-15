@@ -303,8 +303,6 @@ ER-диаграмма - C4_5_TOBE_ER.puml
 
     ```bash
 
-    Копировать код
-
     `{
 
       "status": "Heating turned on"
@@ -328,7 +326,6 @@ ER-диаграмма - C4_5_TOBE_ER.puml
 -   **Тело запроса (JSON)**:
 
     ```bash
-
 
     `{
 
@@ -371,11 +368,11 @@ ER-диаграмма - C4_5_TOBE_ER.puml
 
 #### Пример:
 
-```bash
+	```bash
 
-`GET /heating/status?userId=12345`
+	`GET /heating/status?userId=12345`
 
-```
+	```
 
 #### Ответ:
 
@@ -480,7 +477,6 @@ ER-диаграмма - C4_5_TOBE_ER.puml
 
 	```bash
 
-
 	`GET /temperature/history?sensorId=ABC123&startDate=2024-11-14T00:00:00Z&endDate=2024-11-15T00:00:00Z` 
 	```
 #### Ответ:
@@ -520,7 +516,6 @@ ER-диаграмма - C4_5_TOBE_ER.puml
     
     ```bash
 
-    
     `{
       "deviceId": "string",
       "name": "string",
@@ -756,7 +751,6 @@ ER-диаграмма - C4_5_TOBE_ER.puml
 
 	```bash
 
-
 	`GET /users/details?userId=12345` 
 	```
 
@@ -777,25 +771,238 @@ ER-диаграмма - C4_5_TOBE_ER.puml
 
 
 
+### 5. API Notification Service
+
+
+#### 1. Отправить уведомление
+
+**Метод**:  `POST`  
+**Путь**:  `/notifications/send`  
+**Описание**: Отправляет уведомление указанному пользователю.
+
+#### Запрос:
+
+-   **Тело запроса (JSON)**:
+    
+    ```bash
+    
+    `{
+      "userId": "string",
+      "message": "string",
+      "type": "string"
+    }` 
+    
+    ```
+
+#### Ответ:
+
+-   **Код 200 (успех)**:
+    
+    ```bash
+    
+    `{
+      "status": "Notification sent"
+    }` 
+    
+    ```
+
+----------
+
+#### 2. Получить статус уведомления
+
+**Метод**:  `GET`  
+**Путь**:  `/notifications/status`  
+**Описание**: Возвращает статус отправленного уведомления.
+
+#### Запрос:
+
+-   **Параметры строки запроса**:
+    -   `notificationId`  (строка, обязательный): Уникальный идентификатор уведомления.
+
+#### Пример:
+
+	```bash
+	`GET /notifications/status?notificationId=abcd1234` 
+	```
+
+#### Ответ:
+
+-   **Код 200 (успех)**:
+    
+    ```bash
+    
+    `{
+      "notificationId": "abcd1234",
+      "status": "delivered"
+    }` 
+    ```
+
+----------
+
+#### 3. Получить историю уведомлений
+
+**Метод**:  `GET`  
+**Путь**:  `/notifications/history`  
+**Описание**: Возвращает список уведомлений, отправленных указанному пользователю.
+
+#### Запрос:
+
+-   **Параметры строки запроса**:
+    -   `userId`  (строка, обязательный): Уникальный идентификатор пользователя.
+    -   `startDate`  (строка, обязательный): Начальная дата в формате  `date-time`.
+    -   `endDate`  (строка, обязательный): Конечная дата в формате  `date-time`.
+
+#### Пример:
+
+	```bash
+
+	`GET /notifications/history?userId=12345&startDate=2024-11-01T00:00:00Z&endDate=2024-11-15T23:59:59Z` 
+	```
+
+
+#### Ответ:
+
+-   **Код 200 (успех)**:
+    
+    ```bash
+    
+    `{
+      "notifications": [
+        {
+          "notificationId": "abcd1234",
+          "message": "Message text",
+          "type": "email",
+          "status": "delivered",
+          "timestamp": "2024-11-10T14:00:00Z"
+        },
+        {
+          "notificationId": "efgh5678",
+          "message": "Message text",
+          "type": "sms",
+          "status": "delivered",
+          "timestamp": "2024-11-12T09:00:00Z"
+        }
+      ]
+    }` 
+	```
+
+### 6. Scenario Management Service
 
 
 
+#### 1. Создать новый сценарий
 
+**Метод**:  `POST`  
+**Путь**:  `/scenarios/create`  
+**Описание**: Создаёт новый сценарий автоматизации для указанного пользователя.
 
+#### Запрос:
 
+-   **Тело запроса (JSON)**:
+    
+    ```bash
+    
+    `{
+      "userId": "string",
+      "trigger": "string",
+      "action": "string"
+    }` 
+    
+    ```
 
+#### Ответ:
+
+-   **Код 200 (успех)**:
+    
+    ```bash
+    
+    `{
+      "status": "Scenario created",
+      "scenarioId": "string"
+    }` 
+    
+    ```
+----------
+
+#### 2. Удалить существующий сценарий
+
+**Метод**:  `DELETE`  
+**Путь**:  `/scenarios/delete`  
+**Описание**: Удаляет сценарий по его уникальному идентификатору.
+
+#### Запрос:
+
+-   **Параметры строки запроса**:
+    -   `scenarioId`  (строка, обязательный): Уникальный идентификатор сценария, который нужно удалить.
+
+#### Пример:
+
+	```bash
+
+	`DELETE /scenarios/delete?scenarioId=abcd1234` 
+	```
+#### Ответ:
+
+-   **Код 200 (успех)**:
+    
+    ```bash
+    
+    `{
+      "status": "Scenario deleted"
+    }` 
+    
+    ```
+
+----------
+
+### 3. Получить список сценариев пользователя
+
+**Метод**:  `GET`  
+**Путь**:  `/scenarios/list`  
+**Описание**: Возвращает список всех сценариев, связанных с указанным пользователем.
+
+#### Запрос:
+
+-   **Параметры строки запроса**:
+    -   `userId`  (строка, обязательный): Уникальный идентификатор пользователя.
+
+#### Пример:
+
+	```bash
+
+	`GET /scenarios/list?userId=12345` 
+	```
+
+#### Ответ:
+
+-   **Код 200 (успех)**:
+    
+    ```bash
+    
+    `{
+      "scenarios": [
+        {
+          "scenarioId": "abcd1234",
+          "trigger": "триггер",
+          "action": "действие 1"
+        },
+        {
+          "scenarioId": "efgh5678",
+          "trigger": "триггер",
+          "action": "включить устройство"
+        }
+      ]
+    }` 
+    
+    ```
 
 ## 4. Документирование API с помощью Swagger и AsyncAPI
 
 
-API описаны в отдельных файлах с соответставующими микросервисам именами.
-
-* **API_Heating Control Service**
-* **API_Temperature Monitoring Service** 
-* **API_Device Management Service** 
-* **API_User Management Service**
-* **API_Notification Service**
-* **API_Scenario Management Service**
-
-
-
+API описаны в файлах с соответставующими микросервисам именами:
+* **API_Heating Control Service.yaml**
+* **API_Temperature Monitoring Service.yaml**
+* **API_Device Management Service.yaml**
+* **API_User Management Service.yaml**
+* **API_Notification Service.yaml**	
+* **API_Scenario Management Service.yaml**	
