@@ -137,14 +137,10 @@ C4 - Уровень контекста (Context) - 1_Monolith_Context_Diagram.pu
 
 ## 3. Визуализация архитектуры:
 
-!! Диаграммы открываются без ошибок в http://www.plantuml.com/ 
-
 *   C4 — Уровень контейнеров (Containers) - C4_2_TOBE_Container.puml
 *   C4 — Уровень компонентов (Components) - C4_3_TOBE_Components.puml
-
         Пример диаграммы Components для сервиса Device Management Service 
 *   C4 — Уровень кода (Code) - C4_4_TOBE_Code.puml
-
         Пример диаграммы Code для сценария добавления нового устройства.
 
 
