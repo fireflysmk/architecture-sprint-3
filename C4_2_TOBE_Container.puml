@@ -1,9 +1,9 @@
 @startuml
-title Device Management System Component Diagram
+title Device Management System Container Diagram
 
 top to bottom direction
 
-!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Container.puml
 
 Container_Boundary(System, "Device Management System") {
   Container(API_Gateway, "API Gateway", "Kong", "Единый вход для клиентских запросов, маршрутизирует их к микросервисам")
