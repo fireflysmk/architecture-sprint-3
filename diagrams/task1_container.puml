@@ -1,0 +1,23 @@
+@startuml
+title Диаграмма контейнеров - Теплый дом
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы")
+Person(specialist, "Specialist", "Подключение к системе")
+System(SmartHomeSystem, "Smarthome System", "Система  удаленного  отопления в доме")
+
+Container_Boundary(SmartHomeSystem, "Smarthome System") {
+  Container(WebApp, "Web Application", "Java, Spring", "Обработка пользовательский запросов")
+  Container(Database, "Database", "PostgreSQL", "Данные пользователей и с датчиков")
+}
+
+System_Ext(sensor, "Датчик отопления", "Вкл/выкл отопление, поддержка заданной температуры")
+
+Rel(user, WebApp, "Использование системы")
+Rel(specialist,WebApp, "Подключение к системе")
+Rel(WebApp,sensor, "Вкл/выкл, актуальная температура")
+Rel(WebApp,Database,"Запись/чтение данных пользователя и с датчиков")
+@enduml
