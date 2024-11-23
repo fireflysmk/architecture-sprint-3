@@ -1,9 +1,9 @@
-package ru.yandex.practicum.smarthome.dto;
+package ru.yandex.practicum.smarthome.heating.dto;
 
 import lombok.Data;
 
 @Data
-public class HeatingSystemDto {
+public class HeatingDto {
     private Long id;
     private boolean isOn;
     private double targetTemperature;
