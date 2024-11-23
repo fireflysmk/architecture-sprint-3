@@ -11,6 +11,7 @@ System(SmartHomeSystem, "Smarthome System", "Система  удаленног�
 
 Container_Boundary(SmartHomeSystem, "Smarthome System") {
   Container(WebApp, "Web Application", "Java, Spring", "Обработка пользовательский запросов")
+  Container(ApiGateway, "Api Gateway", "Nginx", "Обработка пользовательский запросов")
   Container(HealtingService, "Healting Service", "Java, Spring", "Сервис отопления")
   Container(LightService, "Light Service", "Java, Spring", "Сервис освещения")
   Container(GatesService, "Gates Service", "Java, Spring", "Сервис ворот")
@@ -30,10 +31,11 @@ System_Ext(cameraSensor, "Модуль камеры", "Показ, запись 
 
 Rel(user, WebApp, "Использование системы")
 Rel(admin,WebApp, "Администрирование системы")
-Rel(WebApp,HealtingService,"Processes payment requests")
-Rel(WebApp,LightService,"Processes payment requests")
-Rel(WebApp,GatesService,"Processes payment requests")
-Rel(WebApp,CameraService,"Processes payment requests")
+Rel(WebApp,ApiGateway,"Все запросы")
+Rel(ApiGateway,HealtingService,"запросы для с. отопления")
+Rel(ApiGateway,LightService,"запросы для c. света")
+Rel(ApiGateway,GatesService,"запросы для c. ворот")
+Rel(ApiGateway,CameraService,"запросы для c. видеонаблюдения")
 Rel(HealtingService,healtingSensor, "Вкл/выкл, актуальная температура")
 Rel(HealtingService,HealtingDatabase,"Запись/чтение данных пользователя и с датчиков")
 Rel(LightService,LightDatabase,"Запись/чтение данных пользователя и с датчиков")
