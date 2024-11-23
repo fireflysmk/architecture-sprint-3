@@ -19,6 +19,7 @@ class HeatingScenario {
   +Long heatingId
   +Enum type
   +String cron
+  +boolean active
 }
 
 class Heating {

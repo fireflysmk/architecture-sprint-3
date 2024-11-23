@@ -1,0 +1,48 @@
+@startuml
+' hide the spot
+' hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "User" as u {
+  *u_id : number <<generated>>
+  --
+  *name : text
+}
+
+entity "Heating" as h {
+  *h_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  is_on : boolean
+  target_temperature : double
+  current_temperature : double
+  last_updated : date
+}
+
+entity "HeatingScenario" as hs {
+  *hs_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  *h_id : number <<FK>>
+  target_temperature : double
+  min_activate_temperature : double
+  cron : text
+  active : boolean
+  startDate: date
+  endDate: date
+}
+
+entity "Entity04" as e04 {
+  *e4_id : number <<generated>>
+  --
+  e1_id : number <<FK>>
+  other_details : text
+}
+
+u |o..o| h
+u |o..o{ hs
+h |o..o{ hs
+
+@enduml

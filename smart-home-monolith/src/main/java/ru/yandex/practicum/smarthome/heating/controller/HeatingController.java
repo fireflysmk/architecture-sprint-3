@@ -18,11 +18,11 @@ import ru.yandex.practicum.smarthome.heating.service.HeatingService;
 @RestController
 @RequestMapping("/api/heating")
 @RequiredArgsConstructor
-public class HeatingSystemController {
+public class HeatingController {
 
     private final HeatingService heatingService;
 
-    private static final Logger logger = LoggerFactory.getLogger(HeatingSystemController.class);
+    private static final Logger logger = LoggerFactory.getLogger(HeatingController.class);
 
     @GetMapping("/{id}")
     public ResponseEntity<HeatingDto> getHeatingSystem(@PathVariable("id") Long id) {
