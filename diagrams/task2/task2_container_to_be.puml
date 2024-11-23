@@ -1,0 +1,46 @@
+@startuml
+title Диаграмма контейнеров - Теплый дом
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы")
+Person(admin, "Admin", "Администрирование системы")
+System(SmartHomeSystem, "Smarthome System", "Система  удаленного управления в доме")
+
+Container_Boundary(SmartHomeSystem, "Smarthome System") {
+  Container(WebApp, "Web Application", "Java, Spring", "Обработка пользовательский запросов")
+  Container(HealtingService, "Healting Service", "Java, Spring", "Сервис отопления")
+  Container(LightService, "Light Service", "Java, Spring", "Сервис освещения")
+  Container(GatesService, "Gates Service", "Java, Spring", "Сервис ворот")
+  Container(CameraService, "Camera Service", "Java, Spring", "Сервис видеонаблюдения")
+  Container(HealtingDatabase,"Database", "PostgreSQL", "Данные пользователей и с датчиков")
+  Container(LightDatabase,"Light Database", "PostgreSQL", "Данные пользователей и с датчиков")
+  Container(GatesDatabase,"Gates Database", "PostgreSQL", "Данные пользователей и с датчиков")
+  Container(CameraDatabase,"Camera Database", "PostgreSQL", "Данные пользователей и с датчиков")
+  Container(CameraS3Database,"Camera Database", "S3", "Хранение видео")
+}
+Container_Boundary(SensorSmartHomeSystem, "Умные устройства") {
+System_Ext(healtingSensor, "Датчик отопления", "Вкл/выкл отопление, поддержка заданной температуры")
+System_Ext(lightSensor, "Датчик света", "Вкл/выкл свет, расписание, по движению")
+System_Ext(gatesSensor, "Датчик ворот", "Откр/закр ворота")
+System_Ext(cameraSensor, "Модуль камеры", "Показ, запись видео")
+}
+
+Rel(user, WebApp, "Использование системы")
+Rel(admin,WebApp, "Администрирование системы")
+Rel(WebApp,HealtingService,"Processes payment requests")
+Rel(WebApp,LightService,"Processes payment requests")
+Rel(WebApp,GatesService,"Processes payment requests")
+Rel(WebApp,CameraService,"Processes payment requests")
+Rel(HealtingService,healtingSensor, "Вкл/выкл, актуальная температура")
+Rel(HealtingService,HealtingDatabase,"Запись/чтение данных пользователя и с датчиков")
+Rel(LightService,LightDatabase,"Запись/чтение данных пользователя и с датчиков")
+Rel(LightService,lightSensor, "Вкл/выкл свет, расписание, по движению")
+Rel(GatesService,GatesDatabase,"Запись/чтение данных пользователя и с датчиков")
+Rel(GatesService,gatesSensor, "Откр/закр ворота")
+Rel(CameraService,CameraDatabase,"Запись/чтение данных пользователя и с датчиков")
+Rel(CameraService,CameraS3Database,"Запись/чтение данных пользователя и с датчиков")
+Rel(CameraService,cameraSensor, "Показ, запись видео")
+@enduml
