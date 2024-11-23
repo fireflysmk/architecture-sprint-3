@@ -11,10 +11,17 @@ entity "User" as u {
   *name : text
 }
 
+entity "House" as house {
+  *house_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  *address : text
+}
+
 entity "Heating" as h {
   *h_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   is_on : boolean
   target_temperature : double
   current_temperature : double
@@ -24,7 +31,7 @@ entity "Heating" as h {
 entity "HeatingScenario" as hs {
   *hs_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   *h_id : number <<FK>>
   target_temperature : double
   min_activate_temperature : double
@@ -37,7 +44,7 @@ entity "HeatingScenario" as hs {
 entity "Gates" as g {
   *g_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   target_is_open: boolean
   current_is_open: boolean
   last_updated : date
@@ -46,7 +53,7 @@ entity "Gates" as g {
 entity "GatesScenario" as gs {
   *gs_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   *g_id : number <<FK>>
   cron_open : text
   cron_close : text
@@ -58,7 +65,7 @@ entity "GatesScenario" as gs {
 entity "Light" as l {
   *l_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   target_is_on: boolean
   current_is_on: boolean
   last_updated : date
@@ -67,7 +74,7 @@ entity "Light" as l {
 entity "LightScenario" as ls {
   *ls_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   *l_id : number <<FK>>
   cron_on : text
   cron_off : text
@@ -79,14 +86,14 @@ entity "LightScenario" as ls {
 entity "Camera" as c {
   *c_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   camera_stream_id: number <<FK>>
 }
 
 entity "CameraScenario" as cs {
   *cs_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   *c_id : number <<FK>>
   active : boolean
   start_date: date
@@ -97,28 +104,29 @@ entity "CameraScenario" as cs {
 entity "VideBLOB" as cb {
   *ls_id : number <<generated>>
   --
-  *u_id : number <<FK>>
+  *house_id : number <<FK>>
   *c_id : number <<FK>>
   created_date: date
 }
 
+u |o..o{ house
 
-u |o..o| h
-u |o..o{ hs
+house |o..o| h
+house |o..o{ hs
 h |o..o{ hs
 
 
-u |o..o| g
-u |o..o{ gs
+house |o..o| g
+house |o..o{ gs
 g |o..o{ gs
 
-u |o..o| l
-u |o..o{ ls
+house |o..o| l
+house |o..o{ ls
 l |o..o{ ls
 
-u |o..o| c
-u |o..o{ cs
-u |o..o{ cb
+house |o..o| c
+house |o..o{ cs
+house |o..o{ cb
 c |o..o{ cs
 c |o..o{ cb
 @enduml
