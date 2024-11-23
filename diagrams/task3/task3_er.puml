@@ -30,19 +30,95 @@ entity "HeatingScenario" as hs {
   min_activate_temperature : double
   cron : text
   active : boolean
-  startDate: date
-  endDate: date
+  start_date: date
+  end_date: date
 }
 
-entity "Entity04" as e04 {
-  *e4_id : number <<generated>>
+entity "Gates" as g {
+  *g_id : number <<generated>>
   --
-  e1_id : number <<FK>>
-  other_details : text
+  *u_id : number <<FK>>
+  target_is_open: boolean
+  current_is_open: boolean
+  last_updated : date
 }
+
+entity "GatesScenario" as gs {
+  *gs_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  *g_id : number <<FK>>
+  cron_open : text
+  cron_close : text
+  active : boolean
+  start_date: date
+  end_date: date
+}
+
+entity "Light" as l {
+  *l_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  target_is_on: boolean
+  current_is_on: boolean
+  last_updated : date
+}
+
+entity "LightScenario" as ls {
+  *ls_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  *l_id : number <<FK>>
+  cron_on : text
+  cron_off : text
+  active : boolean
+  start_date: date
+  end_date: date
+}
+
+entity "Camera" as c {
+  *c_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  camera_stream_id: number <<FK>>
+}
+
+entity "CameraScenario" as cs {
+  *cs_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  *c_id : number <<FK>>
+  active : boolean
+  start_date: date
+  end_date: date
+  record_life_time: number
+}
+
+entity "VideBLOB" as cb {
+  *ls_id : number <<generated>>
+  --
+  *u_id : number <<FK>>
+  *c_id : number <<FK>>
+  created_date: date
+}
+
 
 u |o..o| h
 u |o..o{ hs
 h |o..o{ hs
 
+
+u |o..o| g
+u |o..o{ gs
+g |o..o{ gs
+
+u |o..o| l
+u |o..o{ ls
+l |o..o{ ls
+
+u |o..o| c
+u |o..o{ cs
+u |o..o{ cb
+c |o..o{ cs
+c |o..o{ cb
 @enduml
