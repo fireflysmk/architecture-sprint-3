@@ -6,7 +6,7 @@ top to bottom direction
 !includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
 
 Container_Boundary(SmartHomeSystem, "Smarthome System") {
-  Container(WebApp, "Web Application", "Java, Spring", "Взаимодействие с пользователем")
+  Container(WebApp, "Web Application", "Java, Spring", "Сервис отопления")
   Container(Database, "Database", "PostgreSQL", "Данные пользователей и с датчиков")
 }
 
