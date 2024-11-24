@@ -1,0 +1,56 @@
+@startuml
+title Диаграмма контейнеров - Теплый дом
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы")
+Person(admin, "Admin", "Администрирование системы")
+System(SmartHomeSystem, "Smarthome System", "Система  удаленного управления в доме")
+
+Container_Boundary(SmartHomeSystem, "Smarthome System") {
+  Container(MobileApp, "Mobile Application", "Kotlin, Swift", "Обработка пользовательский запросов")
+  Container(WebApp, "Web Application", "Java, Spring", "Обработка пользовательский запросов")
+  Container(ApiGateway, "Api Gateway", "Nginx", "Обработка пользовательский запросов")
+  Container(UserService, "User Service", "Java, Spring", "Сервис пользователей/домов")
+  Container(HealtingService, "Healting Service", "Java, Spring", "Сервис отопления")
+  Container(LightService, "Light Service", "Java, Spring", "Сервис освещения")
+  Container(GatesService, "Gates Service", "Java, Spring", "Сервис ворот")
+  Container(CameraService, "Camera Service", "Java, Spring", "Сервис видеонаблюдения")
+  Container(UserDatabase,"User Database", "PostgreSQL", "Данные пользователей и домов")
+  Container(HealtingDatabase,"Healting Database", "PostgreSQL", "Данные пользователей и с датчиков")
+  Container(LightDatabase,"Light Database", "PostgreSQL", "Данные пользователей и с датчиков")
+  Container(GatesDatabase,"Gates Database", "PostgreSQL", "Данные пользователей и с датчиков")
+  Container(CameraDatabase,"Camera Database", "PostgreSQL", "Данные пользователей и с датчиков")
+  Container(CameraS3Database,"Camera Database", "S3", "Хранение видео")
+}
+Container_Boundary(SensorSmartHomeSystem, "Умные устройства") {
+System_Ext(healtingSensor, "Датчик отопления", "Вкл/выкл отопление, поддержка заданной температуры")
+System_Ext(lightSensor, "Датчик света", "Вкл/выкл свет, расписание, по движению")
+System_Ext(gatesSensor, "Датчик ворот", "Откр/закр ворота")
+System_Ext(cameraSensor, "Модуль камеры", "Показ, запись видео")
+}
+
+Rel(user, WebApp, "Использование системы")
+Rel(user, MobileApp, "Использование системы")
+Rel(admin,WebApp, "Администрирование системы")
+Rel(admin,MobileApp, "Администрирование системы")
+Rel(WebApp,ApiGateway,"Все запросы [REST/HTTPS]")
+Rel(MobileApp,ApiGateway,"Все запросы [REST/HTTPS]")
+Rel(ApiGateway,HealtingService,"запросы для с. отопления [REST/HTTPS]")
+Rel(ApiGateway,UserService,"запросы пользователей/домов [REST/HTTPS]")
+Rel(ApiGateway,LightService,"запросы для c. света [REST/HTTPS]")
+Rel(ApiGateway,GatesService,"запросы для c. ворот [REST/HTTPS]")
+Rel(ApiGateway,CameraService,"запросы для c. видеонаблюдения [REST/HTTPS]")
+Rel(UserService,UserDatabase,"Регистрация пользователей, создание/получение домов [SQL/TCP]")
+Rel(HealtingService,healtingSensor, "Вкл/выкл, актуальная температура [REST/HTTPS]")
+Rel(HealtingService,HealtingDatabase,"Запись/чтение данных пользователя и с датчиков [SQL/TCP]")
+Rel(LightService,LightDatabase,"Запись/чтение данных пользователя и с датчиков [SQL/TCP]")
+Rel(LightService,lightSensor, "Вкл/выкл свет, расписание, по движению [REST/HTTPS]")
+Rel(GatesService,GatesDatabase,"Запись/чтение данных пользователя и с датчиков [SQL/TCP]")
+Rel(GatesService,gatesSensor, "Откр/закр ворота [REST/HTTPS]")
+Rel(CameraService,CameraDatabase,"Запись/чтение данных пользователя и с датчиков [SQL/TCP]")
+Rel(CameraService,CameraS3Database,"Запись/чтение данных пользователя и с датчиков [SQL/TCP]")
+Rel(CameraService,cameraSensor, "Показ, запись видео [REST/HTTPS]")
+@enduml

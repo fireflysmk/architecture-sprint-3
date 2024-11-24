@@ -1,0 +1,22 @@
+@startuml
+title Диаграмма компонентов - Теплый дом
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(SmartHomeSystem, "Smarthome System") {
+  Container(WebApp, "Web Application", "Java, Spring", "Сервис отопления")
+  Container(Database, "Database", "PostgreSQL", "Данные пользователей и с датчиков")
+}
+
+Container(WebApp, "Web Application", "Java, Spring") {
+  Component(HeatingSystemController, "HeatingSystemController", "Управление системой отопления")
+  Component(HeatingSystemService, "HeatingSystem Service", "Business logic")
+  Component(HeatingSystemRepository, "HeatingSystem Repository", "Data access logic")
+}
+
+Rel(HeatingSystemController,HeatingSystemService,"Вызов бизнес логики")
+Rel(HeatingSystemService,HeatingSystemRepository,"Запись/чтение данных")
+Rel(HeatingSystemRepository,Database,"Запись/чтение данных пользователя и с датчиков")
+@enduml

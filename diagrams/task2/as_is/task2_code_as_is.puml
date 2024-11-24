@@ -1,0 +1,26 @@
+@startuml
+title SmartHome HeatingSystemService Code Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+class HeatingSystemService {
+    +HeatingSystemDto getHeatingSystem(Long id)
+    +HeatingSystemDto updateHeatingSystem(Long id, HeatingSystemDto heatingSystemDto)
+    +void turnOn(Long id)
+    +void turnOff(Long id)
+    +void setTargetTemperature(Long id, double temperature)
+    +Double getCurrentTemperature(Long id)
+}
+
+class HeatingSystem {
+  +Long id
+  +boolean isOn
+  +Double targetTemperature
+  +Double currentTemperature
+}
+
+HeatingSystemService -- HeatingSystem : use
+
+@enduml

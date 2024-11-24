@@ -1,0 +1,24 @@
+@startuml
+title Диаграмма контекста - Умный дом
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы")
+Person(admin, "Admin", "Администратор")
+System(SmartHomeSystem, "Умный дом", "Удаленное управление отоплением, светом, воротами, видео")
+
+System_Ext(healting, "Датчик отопления", "Вкл/выкл отопление, поддержка заданной температуры")
+System_Ext(light, "Датчик света", "Вкл/выкл свет, расписание, по движению")
+System_Ext(gates, "Датчик ворот", "Открыть/закрыть ворота")
+System_Ext(camera, "Видео наблюдение", "Показ, запись видео")
+
+Rel(user, SmartHomeSystem, "Использование системы")
+Rel(admin,SmartHomeSystem, "Администрирование системы")
+Rel(SmartHomeSystem,healting, "Вкл/выкл, актуальная температура")
+Rel(SmartHomeSystem,light, "Вкл/выкл свет, расписание, по движению")
+Rel(SmartHomeSystem,gates, "Откр/закр ворота")
+Rel(SmartHomeSystem,camera, "Показ, запись видео")
+
+@enduml

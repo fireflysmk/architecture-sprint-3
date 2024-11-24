@@ -1,3 +1,15 @@
+# Задание part1 задачи 1-3
+    все задания расположены в папке /diagrams, файлы *.puml и .txt
+    задание1: /diagrams/task1
+    задание2: /diagrams/task2
+    задание3: /diagrams/task3
+Описание решения в файлах:
+
+[описание задания 1 task1.txt](diagrams/task1/task1.txt)
+
+[описание задания 2 task2_to_be.txt](diagrams/task2/to_be/task2_to_be.txt)
+
+[описание задание 3 task3.txt](diagrams/task3/task3.txt)
 # Базовая настройка
 
 ## Запуск minikube
