@@ -21,8 +21,8 @@ Container(WebApp, "Web Application", "Java, Spring") {
 
 Rel(HeatingController,HeatingService,"Вызов бизнес логики")
 Rel(HeatingService,HeatingRepository,"Запись/чтение данных")
-Rel(HeatingRepository,Database,"Запись/чтение данных пользователя и с датчиков")
+Rel(HeatingRepository,Database,"Запись/чтение данных пользователя и с датчиков [SQL/TCP]")
 Rel(HeatingScenarioController,HeatingScenarioService,"Вызов бизнес логики")
 Rel(HeatingScenarioService,HeatingScenarioRepository,"Запись/чтение данных")
-Rel(HeatingScenarioRepository,Database,"Запись/чтение сценарией пользователя")
+Rel(HeatingScenarioRepository,Database,"Запись/чтение сценарией пользователя [SQL/TCP]")
 @enduml
