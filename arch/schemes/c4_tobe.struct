@@ -1,0 +1,191 @@
+workspace "Smart Home" {
+
+    !identifiers hierarchical
+
+    model {
+    
+        u = person "Пользователь"
+    
+        
+        frontend = softwareSystem "Frontend" {
+            tags "IsExternal"
+        }
+        
+        backend = softwareSystem "Smart Home Platform" {
+            api_gateway = container "Api GateWay"
+
+            auth_service = container "AuthService" "Аутентификация и авторизация. Проверка учетных данных, управление токенами, предоставление ролей и прав доступа" 
+            user_profile_service_api = container  "UserProfileService Api" "API для управления пользовательскими профилями"
+
+            group "DeviceManagementService" {
+                device_management_service_api = container "DeviceManagementService Api" "API для управления устройствами и модулями"{
+                    device_controller = component "DeviceController" "Предоставляет API для управления устройства и модулями"
+                    home_controller = component "HomeController" "Предоставляет API для управления домами"
+                    scenarios_controller = component "ScenarioController" "Предоставляет API для управления сценариями использования"
+                    
+                    device_service = component "DeviceService" "Сервис бизнес-логики для устройств"
+                    home_service = component "HomeService" "Сервис бизнес-логики для домов"
+                    scenarios_service = component "ScenarioService" "Сервис бизнес-логики для сценариев использования"
+                    
+                    device_repository = component "DeviceRepository" "Репозиторий устройств"
+                    home_repository = component "HomeRepository" "Репозиторий домов"
+                    scenarios_repository = component "ScenarioRepository" "Репозиторий сценариев использования"
+                }
+                device_management_service_task_scheduler = container "DeviceManagementService TaskScheduler" "Отправка команд на устройства по расписанию сценариев использования"
+                device_management_service_db = container "DeviceManagementServiceDb" "PostgreSQL" {
+                    tags "Database"
+                }
+            }
+            
+            group "MonitoringService" {
+                monitoring_service_api = container "MonitoringService Api" "API для показаний данных модулей"
+                monitoring_service_realtime_sensor_display = container "MonitoringService RealTimeSensorDisplay" "Получение последних показаний датчиков и передача их на фронт"
+                monitoring_service_db = container "MonitoringServiceDb" "PostgreSQL" {
+                    tags "Database"
+                }
+                
+            }
+            
+            group "TelemetryHub" {
+                telemetry_hub_api = container "TelemetryHub Api" "API для получения показания модулей"
+                telemetry_saver = container "TelemetrySaver" "Сохранение показаний из telemetry-topic"
+                telemetry_hub_db = container "TelemetryHubDb" "Хранение телеметрии модулей (Clickhouse)"
+            }
+            
+            telemetry_collector = container "TelemetryCollector" "Опрос устройств и сохранение показаний в telemetry-topic"
+            telemetry_topic = container "Telemetry Topic" "Топик показаний датчиков" {
+                tags "Queue"
+            }
+            
+            device_controller = container "DeviceController" "Взаимодействие с устройством"
+            
+            notification_service_api = container "NotificationService" "Уведомления пользователей через почту или смс"
+            
+            alert_topic = container "Alert Topic" "Топик алертов (Kafka)" {
+                tags "Queue"
+            }
+        }
+        
+        device = softwareSystem "Датчик температуры" {
+            tags "IsExternal"
+        }
+        
+        emailExtService = softwareSystem "Внешняя система для отправки писем" {
+            tags "IsExternal"
+        }
+        
+        smsExtService = softwareSystem "Внешняя система для отправки смс" {
+            tags "IsExternal"
+        }
+        
+        
+        u -> frontend "Включает/выключает устройство\nуправляет температурой\nпросматривает текущую" "Https"
+        
+        frontend -> backend.api_gateway "Использует" "Https"
+        
+        backend.api_gateway -> backend.auth_service 
+        backend.api_gateway -> backend.user_profile_service_api
+        backend.api_gateway -> backend.device_management_service_api
+        backend.api_gateway -> backend.monitoring_service_api
+        
+        backend.device_management_service_api -> backend.device_management_service_db
+        backend.device_management_service_task_scheduler -> backend.device_management_service_db
+        backend.device_management_service_api -> backend.telemetry_hub_api
+        backend.device_management_service_api -> backend.device_controller "1. Вкл/выкл устройство\n2. Устанавливает целевое значение"
+        backend.device_management_service_task_scheduler -> backend.device_controller "Отправляет команды на устройство"
+        
+        backend.monitoring_service_api -> backend.monitoring_service_db
+        backend.monitoring_service_realtime_sensor_display -> backend.monitoring_service_db
+        backend.monitoring_service_api -> backend.telemetry_hub_api "Получает показания модулей за период"
+        backend.monitoring_service_realtime_sensor_display -> frontend "Транслирует текущие показания" "WebSocket"
+        backend.monitoring_service_realtime_sensor_display -> backend.telemetry_topic "Вычитывает последние показания устройств"
+        
+        backend.device_controller -> device "1. Вкл/выкл устройство\n2. Установка целевого значения\n3. Получение текущего показания"
+        
+        backend.telemetry_collector -> backend.device_controller "Получает текущие показания от устройств"
+        backend.telemetry_collector -> backend.alert_topic "Публикует алерты датчиков"
+        backend.telemetry_collector -> backend.telemetry_topic "Публикует показания датчиков"
+        backend.telemetry_collector -> backend.device_management_service_api "Получает информацию об устройствах для опроса"
+        
+        backend.telemetry_hub_api -> backend.telemetry_hub_db 
+        backend.telemetry_saver -> backend.telemetry_hub_db 
+        backend.telemetry_saver -> backend.telemetry_topic "Вычитывает показания датчиков"
+        
+        backend.notification_service_api -> emailExtService "Отправляет письмо"
+        backend.notification_service_api -> smsExtService "Отправляет смс"
+        backend.notification_service_api -> backend.alert_topic "Вычитывает алерты модулей"
+        backend.notification_service_api -> frontend "Отправляет уведомление на сайт"  "WebSocket"
+    
+        backend.device_management_service_api.home_controller -> backend.device_management_service_api.home_service
+        backend.device_management_service_api.device_controller -> backend.device_management_service_api.device_service
+        backend.device_management_service_api.scenarios_controller -> backend.device_management_service_api.scenarios_service
+        backend.device_management_service_api.home_service -> backend.device_management_service_api.home_repository
+        backend.device_management_service_api.device_service -> backend.device_management_service_api.device_repository
+        backend.device_management_service_api.scenarios_service -> backend.device_management_service_api.device_service
+        backend.device_management_service_api.home_service -> backend.device_management_service_api.device_service
+        backend.device_management_service_api.scenarios_service -> backend.device_management_service_api.scenarios_repository
+        
+        frontend -> backend.device_management_service_api.home_controller
+        frontend -> backend.device_management_service_api.device_controller
+        frontend -> backend.device_management_service_api.scenarios_controller
+        
+        backend.device_management_service_api.home_repository -> backend.device_management_service_db
+        backend.device_management_service_api.device_repository -> backend.device_management_service_db
+        backend.device_management_service_api.scenarios_repository -> backend.device_management_service_db
+        
+    }
+      
+
+    views {
+        
+        #  systemLandscape "C1" {
+        #       include *
+        #   }
+          
+        #   container backend "C2" {
+        #       include *
+        #   }
+        
+         component backend.device_management_service_api "C3" {
+              include *
+          }
+        
+        
+        styles {
+            element "Element" {
+                background #008cba
+                color #ffffff
+                shape RoundedBox
+            }
+            element "Person" {
+                background #05527d
+                shape person
+            }
+            element "Software System" {
+                background #066296
+            }
+            element "Database" {
+                shape cylinder
+            }
+            element "Queue" {
+                shape pipe
+            }
+            element "IsNew" {
+                opacity 100
+            }
+            element "IsExternal" {
+                background #969fa8
+            }
+            
+            relationship "Relationship" {
+                style solid
+                routing Curved
+            }
+        }
+    }
+
+    configuration {
+        scope softwaresystem
+    }
+
+}

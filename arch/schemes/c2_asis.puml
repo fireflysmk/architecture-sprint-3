@@ -1,0 +1,26 @@
+@startuml
+!theme plain
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_LEFT_RIGHT()
+skinparam defaultTextAlignment up
+skinparam arrowFontSize 10
+
+Person(user, "Пользователь")
+Person(engineer, "Инженер по подключению")
+
+System_Ext(frontend, "Frontend")
+
+System_Boundary(c1, "Smart Home Monolith") {
+    Container(backend, "Backend")
+    ContainerDb(db, "Postgres")
+}
+
+System_Ext(device, "Датчик температуры")
+
+Rel(user, frontend, "Включает/выключает устройство, управляет температурой, просматривает текущую температуру", "HTTPS")
+Rel(engineer, frontend, "Подключает новые модули", "HTTPS")
+Rel(frontend, backend, "Использует", "HTTPS")
+Rel(backend, device, "Включает/выключает устройство, устанавливает целевую температуру, получает текущую температуру")
+Rel(backend, db, "Сохраняет и получает информацию")
+@enduml

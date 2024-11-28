@@ -1,0 +1,19 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_LANDSCAPE()
+
+Person(user, "Пользователь")
+Person(engineer, "Инженер по подключению")
+
+System_Ext(frontend, "Frontend")
+
+System(backend, "Smart Home Monolith", "Java/PostgreSQL", "dfsdfs")
+
+System_Ext(device, "Датчик температуры")
+
+Rel(user, frontend, "Включает/выключает устройство\nуправляет температурой\nпросматривает текущую температуру", "HTTPS")
+Rel(engineer, frontend, "Подключает новые модули", "HTTPS")
+Rel(frontend, backend, "Использует", "HTTPS")
+Rel(backend, device, "Включает/выключает устройство,\nустанавливает целевую температуру,\nполучает текущую температуру")
+@enduml

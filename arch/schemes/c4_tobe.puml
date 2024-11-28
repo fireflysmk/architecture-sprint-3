@@ -1,0 +1,92 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+skinparam linetype polyline
+
+Person(user, "Пользователь")
+Person(engineer, "Инженер по подключению")
+
+System_Ext(frontend, "Frontend")
+
+System_Boundary(c1, "Smart Home Platform") {
+
+    Container(api_gateway, "API Gateway") 
+
+    
+        Container(auth_service, "AuthService", "", "Аутентификация и авторизация. Проверка учетных данных, управление токенами, предоставление ролей и прав доступа")     
+        Container(user_profile_service_api, "UserProfileService Api", "", "API для управления пользовательскими профилями")
+    
+    
+    Boundary(device_management, "Device Management Service") {
+            Container(device_management_service_api, "DeviceManagementService Api", "", "API для управления устройствами и модулями")
+            Container(device_management_service_task_scheduler, "DeviceManagementService TaskScheduler", "", "Отправка команд на устройства по расписанию сценариев использования")
+            ContainerDb(device_management_service_db, "DeviceManagementServiceDb", "PostgreSQL")
+    }
+
+    Boundary(monitoring, "MonitoringService") {
+        Container(monitoring_service_api, "MonitoringService Api", "", "API для показаний данных модулей")
+        Container(monitoring_service_realtime_sensor_display, "MonitoringService RealTimeSensorDisplay", "", "Получение последних показаний датчиков и передача их на фронт")
+        ContainerDb(monitoring_service_db, "MonitoringServiceDb", "PostgreSQL")
+    }
+
+    Boundary(telemetryhub, "TelemetryHub") {
+       Container(telemetry_hub_api, "TelemetryHub Api", "", "API для получения показания модулей")
+       Container(telemetry_saver, "TelemetrySaver", "", "Сохранение показаний из telemetry-topic")
+       ContainerDb(telemetry_hub_db, "TelemetryHub", "ClickHouse", "Хранение телеметрии модулей")     
+    }
+
+    Container(telemetry_collector, "TelemetryCollector", "", "Опрос устройств и сохранение показаний в telemetry-topic")
+    ContainerQueue(telemetry_topic, "Telemetry Topic", "Kafka", "Топик показаний датчиков")
+      
+    Container(device_controller, "DeviceController", "", "Взаимодействие с устройством")
+
+
+    together {
+        Container(notification_service_api, "NotificationService", "", "Уведомления пользователей через почту или смс")  
+        ContainerQueue(alert_topic, "Alert Topic", "Kafka", "Топик алертов")  
+    }
+}
+
+System_Ext(device, "Датчик температуры")
+
+System_Ext(email_service, "Внешняя система для отправки писем")
+System_Ext(sms_service, "Внешняя система для отправки смс")
+
+Rel(user, frontend, "Включает/выключает устройство, управляет температурой, просматривает текущую температуру", "HTTPS")
+Rel(engineer, frontend, "Подключает новые модули", "HTTPS")
+
+Rel_D(frontend, api_gateway, "Использует", "HTTPS")
+Lay_D(frontend, api_gateway)
+
+Rel(api_gateway, auth_service, "")
+Rel(api_gateway, user_profile_service_api, "")
+Rel(api_gateway, device_management_service_api, "")
+Rel(api_gateway, monitoring_service_api, "")
+
+Rel(device_management_service_api, device_management_service_db, "")
+Rel(device_management_service_task_scheduler, device_management_service_db, "")
+Rel(device_management_service_api, telemetry_hub_api, "")
+Rel(device_management_service_api, device_controller, "1. Вкл/выкл устройство\n2. Устанавливает целевое значение")
+Rel(device_management_service_task_scheduler, device_controller, "Отправляет команды на устройство")
+
+Rel(monitoring_service_api, monitoring_service_db, "")
+Rel(monitoring_service_realtime_sensor_display, monitoring_service_db, "")
+Rel(monitoring_service_api, telemetry_hub_api, "Получает показания модулей за период")
+Rel(monitoring_service_realtime_sensor_display, frontend, "Транслирует текущие показания", "WebSocket")
+
+Rel(device_controller, device, "1. Вкл/выкл устройство\n2. Установка целевого значения\n3. Получение текущего показания")
+
+Rel_D(telemetry_collector, device_controller, "Получает текущие показания от устройств")
+Rel_D(telemetry_collector, alert_topic, "Публикует алерты датчиков")
+Rel_D(telemetry_collector, telemetry_topic, "Публикует показания датчиков")
+Rel_D(telemetry_collector, device_management_service_api, "Получает информацию об устройствах для опроса")
+
+Rel(telemetry_hub_api, telemetry_hub_db, "")
+Rel(telemetry_saver, telemetry_hub_db, "")
+Rel(telemetry_saver, telemetry_topic, "Вычитывает показания датчиков")
+
+Rel(notification_service_api, email_service, "Отправляет письмо")
+Rel(notification_service_api, sms_service, "Отправляет смс")
+Rel(notification_service_api, alert_topic, "Вычитывает алерты модулей")
+Rel(notification_service_api, frontend, "Отправляет уведомление на сайт", "WebSocket")
+@enduml

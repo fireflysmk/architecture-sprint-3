@@ -1,0 +1,71 @@
+﻿@startuml
+
+entity "Houses" as Houses {
+    id : int
+    userid : int
+    name : text
+}
+
+entity "DeviceProtocols" as DeviceProtocols {
+    id : int
+    code : text
+    name : text
+    description : text
+}
+
+entity "Partners" as Partners {
+    id : int
+    name : text
+    inn : text
+    phone : text
+    address : jsonb
+}
+
+entity "DeviceTypes" as DeviceTypes {
+    id : int
+    code : text
+    name : text
+    description : text
+    partnerid : int
+    deviceprotocolid : int
+}
+
+entity "Devices" as Devices {
+    id : int
+    name : text
+    houseid : int
+    devicetypeid : int
+    server : text
+    port : text
+}
+
+entity "Modules" as Modules {
+    id : int
+    deviceid : int
+    moduletypeid : int
+    name : text
+}
+
+entity "ModuleTypes" as ModuleTypes {
+    id : int
+    code : text
+    name : text
+    description : text
+}
+
+entity "Scenarios" as Scenarios {
+    id : int
+    userid : int
+    name : text
+    steps : jsonb
+}
+
+' Определяем связи
+Houses ||--o{ Devices : "houseid"
+Devices ||--o{ Modules : "deviceid"
+DeviceTypes ||--o{ Devices : "devicetypeid"
+DeviceTypes ||--|{ DeviceProtocols : "deviceprotocolid"
+DeviceTypes ||--|{ Partners : "partnerid"
+ModuleTypes ||--o{ Modules : "moduletypeid"
+
+@enduml
