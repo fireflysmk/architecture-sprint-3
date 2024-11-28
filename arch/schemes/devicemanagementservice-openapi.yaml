@@ -1,0 +1,399 @@
+﻿openapi: 3.0.0
+info:
+  title: Stayhouse DeviceManagementService Api
+  version: 1.0.0
+servers:
+  - url: https://stayhouse.com/devicemanagement/api/v1
+
+paths:
+  /houses:
+    get:
+      summary: Получить список всех домов
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/house'
+    post:
+      summary: Создать новый дом
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/houseCreate'
+      responses:
+        '201':
+          description: Создано успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/house'
+
+  /houses/{id}:
+    get:
+      summary: Получить дом по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор дома
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/house'
+        '404':
+          description: Не найдено
+
+    put:
+      summary: Обновить дом по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор дома
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/houseCreate'
+      responses:
+        '200':
+          description: Успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/house'
+
+    delete:
+      summary: Удалить дом по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: идентификатор дома
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Успешно удалено
+        '404':
+          description: Не найдено
+
+  /devices:
+    get:
+      summary: Получить список всех устройств
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+    post:
+      summary: Создать новое устройство
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+      responses:
+        '201':
+          description: Создано успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+  /devices/{id}:
+    get:
+      summary: Получить устройство по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор устройства
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Не найдено
+
+    put:
+      summary: Обновить устройство по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор устройства
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+      responses:
+        '200':
+          description: Успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+
+    delete:
+      summary: Удалить устройство по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор устройства
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Успешно удалено
+        '404':
+          description: Не найдено
+
+  /modules:
+    get:
+      summary: Получить список всех модулей
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Module'
+    post:
+      summary: Создать новый модуль
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleCreate'
+      responses:
+        '201':
+          description: Создано успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Module'
+
+  /modules/{id}:
+    get:
+      summary: Получить модуль по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор модуля
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Module'
+        '404':
+          description: Не найдено
+
+    put:
+      summary: Обновить модуль по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор модуля
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModuleCreate'
+      responses:
+        '200':
+          description: Успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Module'
+
+    delete:
+      summary: Удалить модуль по идентификатору
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор модуля
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Успешно удалено
+        '404':
+          description: Не найдено
+
+
+components:
+  schemas:
+    house:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор объекта house
+        userId:
+          type: integer
+          description: Идентификатор пользователя
+        name:
+          type: string
+          description: Название объекта house
+      required:
+        - id
+        - userId
+        - name
+
+    houseCreate:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: Идентификатор пользователя
+        name:
+          type: string
+          description: Название объекта house
+      required:
+        - userId
+        - name
+
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор устройства
+        userId:
+          type: integer
+          description: Идентификатор пользователя, которому принадлежит устройство
+        houseId:
+          type: integer
+          description: Идентификатор дома, в котором находится устройство
+        deviceTypeId:
+          type: integer
+          description: Идентификатор типа устройства
+        name:
+          type: string
+          description: Название устройства
+        server:
+          type: string
+          description: IP-адрес или хост сервера, связанного с устройством
+        port:
+          type: integer
+          description: Номер порта, используемого устройством
+      required:
+        - id
+        - userId
+        - houseId
+        - deviceTypeId
+        - name
+        - server
+        - port
+
+    DeviceCreate:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: Идентификатор пользователя, которому принадлежит устройство
+        houseId:
+          type: integer
+          description: Идентификатор дома, в котором находится устройство
+        deviceTypeId:
+          type: integer
+          description: Идентификатор типа устройства
+        name:
+          type: string
+          description: Название устройства
+        server:
+          type: string
+          description: IP-адрес или хост сервера, связанного с устройством
+        port:
+          type: integer
+          description: Номер порта, используемого устройством
+      required:
+        - userId
+        - houseId
+        - deviceTypeId
+        - name
+        - server
+        - port
+    
+    Module:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Уникальный идентификатор модуля
+        deviceId:
+          type: integer
+          description: Идентификатор устройства, которому принадлежит модуль
+        moduleTypeId:
+          type: integer
+          description: Идентификатор типа модуля
+        name:
+          type: string
+          description: Название модуля
+      required:
+        - id
+        - deviceId
+        - moduleTypeId
+        - name
+
+    ModuleCreate:
+      type: object
+      properties:
+        deviceId:
+          type: integer
+          description: Идентификатор устройства, которому принадлежит модуль
+        moduleTypeId:
+          type: integer
+          description: Идентификатор типа модуля
+        name:
+          type: string
+          description: Название модуля
+      required:
+        - deviceId
+        - moduleTypeId
+        - name
+

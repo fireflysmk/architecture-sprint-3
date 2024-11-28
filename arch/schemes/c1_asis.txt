@@ -1,0 +1,74 @@
+workspace "Smart Home" {
+
+    !identifiers hierarchical
+
+    model {
+    
+        u = person "Пользователь"
+        
+        e = person " Инженер по подключению" 
+        
+        frontend = softwareSystem "Frontend" {
+            tags "IsExternal"
+        }
+        
+        backend = softwareSystem "Smart Home Monolith" "" "tech"
+        
+        device = softwareSystem "Датчик температуры" {
+            tags "IsExternal"
+        }
+        
+        u -> frontend "Включает/выключает устройство\nуправляет температурой\nпросматривает текущую" "Https"
+        
+        e -> frontend "Подключает новые модули" "Https"
+        
+        frontend -> backend "Использует" "Https"
+        
+        backend -> device "Включает/выключает устройство,\nустанавливает целевую температуру,\nполучает текущую температуру"
+        
+    }
+
+    views {
+        
+         systemLandscape "C1" {
+              include *
+          }
+        
+        styles {
+            element "Element" {
+                background #008cba
+                color #ffffff
+                shape RoundedBox
+            }
+            element "Person" {
+                background #05527d
+                shape person
+            }
+            element "Software System" {
+                background #066296
+            }
+            element "Database" {
+                shape cylinder
+            }
+            element "Queue" {
+                shape pipe
+            }
+            element "IsNew" {
+                opacity 100
+            }
+            element "IsExternal" {
+                background #969fa8
+            }
+            relationship "Relationship" {
+                style solid
+                routing Curved
+                width 600
+            }
+        }
+    }
+
+    configuration {
+        scope softwaresystem
+    }
+
+}
