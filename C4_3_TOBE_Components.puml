@@ -1,0 +1,9 @@
+@startuml
+!theme bluegray
+package "Device Management Service" {
+    [API Component] --> [Command Handler] : Handles Commands
+    [Command Handler] --> [Device State Manager] : Updates Device States
+    [Command Handler] --> [Event Publisher] : Publishes Events
+    [Device State Manager] --> Database : Stores Device Data
+}
+@enduml

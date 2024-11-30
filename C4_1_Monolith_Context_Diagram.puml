@@ -1,0 +1,14 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Context.puml
+
+
+Person(customer, "Пользователь", "Владелец дома")
+System(monolith_system, "Приложение", "Монолитное приложение")
+System_Ext(sensor, "Датчик температуры", "Датчики температуры в доме пользователя")
+
+Rel(customer, monolith_system, "Включение/выключение отопления\nЗапрос температуры")
+Rel(monolith_system, sensor, "Запрос данных о температуре")
+
+@enduml

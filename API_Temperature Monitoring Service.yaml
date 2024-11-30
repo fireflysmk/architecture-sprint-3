@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: Temperature Monitoring Service
+  version: 1.0.0
+paths:
+  /temperature/report:
+    post:
+      summary: Сообщить о текущей температуре
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sensorId:
+                  type: string
+                temperature:
+                  type: number
+                timestamp:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Temperature data recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /temperature/current:
+    get:
+      summary: Получить текущую температуру
+      parameters:
+        - name: sensorId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current temperature data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  temperature:
+                    type: number
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /temperature/history:
+    get:
+      summary: Получить историю температурных данных
+      parameters:
+        - name: sensorId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Temperature history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        temperature:
+                          type: number
+                        timestamp:
+                          type: string
+                          format: date-time
+

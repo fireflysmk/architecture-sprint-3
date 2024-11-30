@@ -1,0 +1,61 @@
+openapi: 3.0.0
+info:
+  title: Notification Service
+  version: 1.0.0
+paths:
+  /notifications/send:
+    post:
+      summary: Отправить уведомление пользователю
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                message:
+                  type: string
+                channel:
+                  type: string
+                  enum: [email, push, SMS]
+      responses:
+        '200':
+          description: Notification sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+
+  /notifications/history:
+    get:
+      summary: Получить историю уведомлений пользователя
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message:
+                          type: string
+                        timestamp:
+                          type: string
+                          format: date-time
+
