@@ -1,0 +1,86 @@
+asyncapi: 2.6.0
+info:
+  title: Teplyi Dom
+  description: Teplyi Dom
+  version: 1.0.0
+servers:
+  production:
+    url: api.tepliydom.com
+    protocol: kafka
+channels:
+  device-scenario:
+    description: Sensor Scenario
+    subscribe:
+      summary: CRUD device scenario
+      operationId: CRUDDeviceScenario
+      message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            id:
+              type: number
+            device_id:
+              type: number
+            command:
+              type: string
+            name:
+              type: string
+    publish:
+      summary: Publish scenario to execute
+      operationId: publishScenarioRun
+      message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            device_id:
+              type: number
+            command:
+              type: string
+  device-control:
+    subscribe:
+      summary: Device management
+      operationId: receiveDevice
+      message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            id:
+              type: number
+            device_id:
+              type: number
+            user_id:
+              type: number
+            house_id:
+              type: number
+            serial_number:
+              type: string
+            timestamp:
+              type: string
+    publish:
+      summary: Send device command
+      operationId: sendDeviceCommand
+      message:
+        contentType: application/json
+        payload:
+          type: object
+          properties:
+            device_id:
+              type: number
+            command:
+              type: string
+  device-telemetry:
+    subscribe:
+      summary: Device telemetry metrics
+      operationId: receiveDeviceTelemetry
+      message:
+        contentType: applicatioin/json
+        payload:
+          type: object
+          properties:
+            device_id:
+              type: number
+            telemetry:
+              type: number

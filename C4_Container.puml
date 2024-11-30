@@ -1,0 +1,64 @@
+@startuml
+title "Теплый Дом" Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "A user of the tepliydom")
+Person(admin, "Administrator", "An administrator managing the system")
+
+System(TepliyDom, "Tepliy Dom")
+System(webApp, "Web application", "Provides all the functionality of tepliydom to customers via  their web browser")
+
+System_Ext(externalDevices, "External devices", "Devices connected by user")
+System_Ext(SmartDevices, "Third-Party Sensors", "External API for fitness data integration")
+
+Container_Boundary(TepliyDom, "") {
+  Container(ApiGateway, "API Gateway", "Kong", "Handles incoming requests")
+  SystemQueue(Queue, "Kafka Queue", "Kafka brokers. Pub/Sub model")
+
+  Container(DeviceManagement, "DeviceManagementService", "Java, Spring", "Manages devices")
+  Container(DeviceScenario, "DeviceScenarioService", "Java, Spring", "Manages Device Scenario")
+  Container(Monitoring, "MonitoringService", "Java, Spring", "Provides device monitoring")
+  Container(UsersManagement, "UserManagementService", "Java, Spring", "Manages Users")
+  Container(TechSupport, "TechnicalSupportService", "Java, Spring", "Manages support tickets")
+  Container(SensorTelemetryService, "SensorTelemetryService", "Java, Spring", "Manages support device telemetry")
+
+  ContainerDb(DeviceManagementDataBase, "DataBase", "PostgreSQL", "Stores device information")
+  ContainerDb(DeviceScenarioDataBase, "DataBase", "PostgreSQL", "Stores scenario information")
+  ContainerDb(MonitoringDataBase, "DataBase", "GreenPlum", "Stores analytics reports")
+  ContainerDb(UsersManagementDataBase, "DataBase", "PostgreSQL", "Stores users information")
+  ContainerDb(TechSupportDataBase, "DataBase", "MongoDB", "Stores support tickets")
+  ContainerDb(SensorTelemetryServiceDatabase, "DataBase", "MongoDB", "Stores device telemetry information")
+}
+
+
+Rel(user, webApp, "Visits teplyidom.com", "HTTPS")
+Rel(admin, webApp, "Visits teplyidom.com", "HTTPS")
+Rel(SmartDevices, ApiGateway, "Makes API calls", "JSON/HTTPS")
+Rel(webApp, ApiGateway, "Makes API calls", "JSON/HTTPS")
+
+Rel(ApiGateway, Queue, "Reads from and writes to", "JSON/ASYNC")
+Rel(ApiGateway, DeviceManagement, "Makes API calls to", "JSON/HTTP")
+Rel(ApiGateway, DeviceScenario, "Makes API calls to", "JSON/HTTP")
+Rel(ApiGateway, UsersManagement, "Makes API calls to", "JSON/HTTP")
+Rel(ApiGateway, Monitoring, "Makes API calls to", "JSON/HTTP")
+Rel(ApiGateway, TechSupport, "Makes API calls to", "JSON/HTTP")
+Rel(ApiGateway, SensorTelemetryService, "Makes API calls to", "JSON/HTTP")
+
+Rel(DeviceManagement, Queue, "Reads from and writes to", "JSON/ASYNC")
+Rel(DeviceScenario, Queue, "Reads from and writes to", "JSON/ASYNC")
+Rel(Monitoring, Queue, "Writes to", "JSON/ASYNC")
+
+Rel(DeviceManagement, DeviceManagementDataBase, "Reads/Writes data", "SQL/TCP")
+Rel(DeviceScenario, DeviceScenarioDataBase, "Reads/Writes data", "SQL/TCP")
+
+Rel(DeviceManagement, externalDevices, "Run commands on device", "HTTPS")
+
+Rel(UsersManagement, UsersManagementDataBase, "Reads/Writes data", "SQL/TCP")
+Rel(Monitoring, MonitoringDataBase, "Reads/Writes data", "SQL/TCP")
+
+Rel(TechSupport, TechSupportDataBase, "Reads/Writes data", "SQL/TCP")
+Rel(SensorTelemetryService, SensorTelemetryServiceDatabase, "Reads/Writes data", "SQL/TCP")
+@enduml

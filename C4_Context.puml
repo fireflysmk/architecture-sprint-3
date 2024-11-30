@@ -1,0 +1,18 @@
+@startuml
+title "Теплый Дом" Context Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "Пользователь системы Теплый Дом")
+Person(admin, "Administrator", "Тех. поддержка компании Теплый Дом")
+System(TepliyDomSystemWebSite, "Веб-сайт", "Веб сайт компании Теплый дом")
+System(TepliyDomSystem, "Монолитное приложение", "Основная мололитная платформа компании Теплый дом")
+System_Ext(heatingSystem, "Heating System", "Внешние приборы(датчики, сенсоры) умного дома")
+
+Rel(user, TepliyDomSystemWebSite, "Использует для просмотра температуры и управления отоплением", "browser")
+Rel(admin,TepliyDomSystemWebSite, "Помогает пользователям при возникновении неполадок", "browser")
+Rel(TepliyDomSystemWebSite, TepliyDomSystem, "Помогает пользователям при возникновении неполадок", "HTTP, synchronous")
+Rel(TepliyDomSystem,heatingSystem,"Получает текущие данные температуры и управляет отоплением", "HTTP, synchronous")
+@enduml

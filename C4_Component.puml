@@ -1,0 +1,49 @@
+@startuml
+title TepliyDom Web Application Component Diagram
+
+top to bottom direction
+'skinparam linetype ortho
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+System(webApp, "Web application", "Provides all the functionality of tepliydom to customers via  their web browser")
+System(externalDevices, "External user devices", "Smart devices that installed in users' home")
+SystemQueue(kafkaQueue, "Kafka Queue", "Kafka brokers. Pub/Sub model")
+
+Container_Boundary(TepliyDom, "TepliyDom Microservices System") {
+  Container(DeviceManagement, "DeviceManagement", "Java, Spring", "Handles user requests")
+  ContainerDb(DMDatabase, "DeviceManagementService Database", "PostgreSQL", "Stores device related information")
+}
+
+Container(DeviceManagement, "DeviceManagementService", "Java, Spring") {
+  Component(registerDeviceController, "Register device controller", "Save new device to a user house. Validates serial number of the device")
+  Component(registerDeviceServiceLayer, "Register device service", "Encapsulate business logic")
+
+  Component(deviceCommandController, "Device Command Contoller", "Runs device commands")
+  Component(deviceCommandServiceLayer, "Device Command Service", "Encapsulates business logic")
+
+  Component(deviceListController, "Device list contoller", "Shows users device info")
+  Component(deviceListServiceLayer, "Device list service", "Encapsulates business logic")
+
+  Component(repositoryLayer, "Repository Layer", "Data access logic")
+}
+
+Rel(webApp, registerDeviceController, "Makes API call", "JSON/HTTP")
+Rel(webApp, deviceCommandController, "Makes API call", "JSON/HTTP")
+Rel(webApp, deviceListController, "Makes API call", "JSON/HTTP")
+
+
+Rel(registerDeviceController, registerDeviceServiceLayer, "Uses")
+Rel(registerDeviceServiceLayer, repositoryLayer, "Uses")
+
+Rel(deviceCommandController, deviceCommandServiceLayer, "Uses")
+Rel(deviceCommandServiceLayer, repositoryLayer, "Uses")
+Rel(deviceCommandController, externalDevices, "Sends API call/Uses driver to run command", "JSON/HTTP")
+Rel(deviceCommandController, kafkaQueue, "Writes current device status", "JSON/ASYNC")
+Rel(kafkaQueue, deviceCommandController, "Reads commands to run on device", "JSON/ASYNC")
+
+Rel(deviceListController, deviceListServiceLayer, "Uses")
+Rel(deviceListServiceLayer, repositoryLayer, "Uses")
+
+Rel(repositoryLayer, DMDatabase,"Reads/Writes device data", "TCP/SQL")
+@enduml
