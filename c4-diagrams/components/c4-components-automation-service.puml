@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+title Диаграмма компонентов для Automation Service
+
+Container_Boundary(automationService, "Automation Service", $tags="") {
+    Component(automationService.APIController, "API Controller", $techn="Python Flask", $descr="Обработка API запросов")
+    Component(automationService.ScenarioManager, "Scenario Manager", $techn="Python", $descr="Управление сценариями")
+    Component(automationService.EventListener, "Event Listener", $techn="Python", $descr="Обработка событий из Kafka")
+    Component(automationService.Scheduler, "Scheduler", $techn="Python", $descr="Планирование задач")
+    Component(automationService.AutomationDBAccess, "Automation DB Access", $techn="Python", $descr="Доступ к базе данных")
+}
+
+ContainerDb(automationDb, "Automation DB", $techn="PostgreSQL", $descr="Сценарии автоматизации")
+Container(kafka, "Kafka", $techn="Apache Kafka", $descr="Шина данных")
+
+Rel(automationService.APIController, automationService.ScenarioManager, "Вызывает", $techn="", $tags="", $link="")
+Rel(automationService.ScenarioManager, automationService.AutomationDBAccess, "Использует", $techn="", $tags="", $link="")
+Rel(automationService.EventListener, automationService.ScenarioManager, "Триггерит сценарии", $techn="", $tags="", $link="")
+Rel(automationService.AutomationDBAccess, automationDb, "Читает и пишет", $techn="SQL/TCP", $tags="", $link="")
+Rel(automationService.EventListener, kafka, "Подписывается на события", $techn="Kafka Protocol", $tags="", $link="")
+Rel(automationService.Scheduler, automationService.ScenarioManager, "Запускает сценарии по расписанию", $techn="", $tags="", $link="")
+
+@enduml

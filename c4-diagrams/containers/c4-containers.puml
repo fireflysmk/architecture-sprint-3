@@ -1,0 +1,75 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Context>
+!include <C4/C4_Container>
+
+title Обновленная диаграмма контейнеров для микросервисной архитектуры с базами данных внутри системной границы
+
+Person(user, "Пользователь", "Управляет умным домом через приложение")
+
+Container(clientApp, "Клиентское приложение", "iOS/Android/Web", "Интерфейс пользователя")
+Container(apiGateway, "API Gateway", "Nginx/Express", "Маршрутизация и аутентификация")
+
+System_Boundary("SmartHomeSystem", "Микросервисы и базы данных") {
+    Container(userService, "User Management Service", "Java", "Аутентификация и авторизация")
+    Container(heatingService, "Heating Control Service", "Java", "Управление отоплением")
+    Container(tempService, "Temperature Monitoring Service", "Python", "Мониторинг температуры")
+    Container(lightingService, "Lighting Control Service", "Node.js", "Управление освещением")
+    Container(accessService, "Access Control Service", "Go", "Контроль доступа")
+    Container(surveillanceService, "Surveillance Service", "C#", "Наблюдение")
+    Container(deviceService, "Device Management Service", "Ruby", "Управление устройствами")
+    Container(automationService, "Automation Service", "Python", "Автоматизация сценариев")
+
+    ContainerDb(userDb, "User DB", "PostgreSQL", "Данные пользователей")
+    ContainerDb(deviceDb, "Device DB", "MongoDB", "Данные устройств")
+    ContainerDb(automationDb, "Automation DB", "PostgreSQL", "Сценарии автоматизации")
+    ContainerDb(telemetryDb, "Telemetry DB", "InfluxDB", "Телеметрические данные")
+    ContainerDb(heatingDb, "Heating DB", "PostgreSQL", "Настройки отопления")
+    ContainerDb(lightingDb, "Lighting DB", "PostgreSQL", "Настройки освещения")
+    ContainerDb(accessDb, "Access DB", "PostgreSQL", "Данные контроля доступа")
+    ContainerDb(surveillanceDb, "Surveillance DB", "PostgreSQL", "Конфигурации камер и записи")
+
+    Container(kafka, "Kafka", "Apache Kafka", "Шина данных")
+}
+
+Container_Ext(heatingDevices, "Heating Devices", "IoT Devices", "Устройства отопления")
+Container_Ext(tempSensors, "Temperature Sensors", "IoT Devices", "Датчики температуры")
+Container_Ext(lightingDevices, "Lighting Devices", "IoT Devices", "Устройства освещения")
+Container_Ext(accessDevices, "Access Devices", "IoT Devices", "Устройства контроля доступа")
+Container_Ext(cameras, "Cameras", "IoT Devices", "Камеры видеонаблюдения")
+
+Rel(user, clientApp, "Использует")
+Rel(clientApp, apiGateway, "Отправляет запросы", "HTTPS")
+
+Rel(apiGateway, userService, "Маршрутизирует для аутентификации", "HTTPS")
+Rel(apiGateway, heatingService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, tempService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, lightingService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, accessService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, surveillanceService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, deviceService, "Маршрутизирует", "HTTPS")
+Rel(apiGateway, automationService, "Маршрутизирует", "HTTPS")
+
+Rel(userService, userDb, "Читает и пишет", "JDBC")
+Rel(deviceService, deviceDb, "Читает и пишет", "MongoDB Protocol")
+Rel(automationService, automationDb, "Читает и пишет", "JDBC")
+Rel(tempService, telemetryDb, "Читает и пишет", "TCP")
+Rel(heatingService, heatingDb, "Читает и пишет", "JDBC")
+Rel(lightingService, lightingDb, "Читает и пишет", "JDBC")
+Rel(accessService, accessDb, "Читает и пишет", "JDBC")
+Rel(surveillanceService, surveillanceDb, "Читает и пишет", "JDBC")
+
+Rel(heatingService, kafka, "Публикует и подписывается на события", "Kafka Protocol")
+Rel(tempService, kafka, "Публикует данные", "Kafka Protocol")
+Rel(lightingService, kafka, "Публикует и подписывается на события", "Kafka Protocol")
+Rel(accessService, kafka, "Публикует и подписывается на события", "Kafka Protocol")
+Rel(surveillanceService, kafka, "Публикует и подписывается на события", "Kafka Protocol")
+Rel(automationService, kafka, "Подписывается на события", "Kafka Protocol")
+
+Rel(heatingService, heatingDevices, "Обменивается данными", "HTTP/MQTT")
+Rel(tempService, tempSensors, "Собирает данные", "HTTP/MQTT")
+Rel(lightingService, lightingDevices, "Обменивается данными", "HTTP/MQTT")
+Rel(accessService, accessDevices, "Обменивается данными", "HTTP/MQTT")
+Rel(surveillanceService, cameras, "Обменивается данными", "RTSP/ONVIF")
+
+@enduml

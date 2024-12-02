@@ -1,0 +1,235 @@
+@startuml
+
+!define primary_key(x) <b>x</b>
+!define foreign_key(x) <u>x</u>
+
+entity "Пользователь" as User {
+    primary_key(id) : UUID
+    --
+    имя : string
+    email : string
+    password_hash : string
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "role" as Role {
+    primary_key(id) : UUID
+    --
+    title : string
+    description : string
+}
+
+entity "Роли пользователя" as UserRole {
+    foreign_key(user_id) : UUID [FK к Пользователь]
+    foreign_key(role_id) : UUID [FK к role]
+    --
+    created_at : datetime
+}
+
+entity "Дом" as House {
+    primary_key(id) : UUID
+    --
+    title : string
+    address : string
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "Доступ пользователя к дому" as UserHouseAccess {
+    foreign_key(user_id) : UUID [FK к Пользователь]
+    foreign_key(house_id) : UUID [FK к Дом]
+    --
+    role : string
+    created_at : datetime
+}
+
+entity "Комната" as Room {
+    primary_key(id) : UUID
+    --
+    foreign_key(house_id) : UUID [FK к Дом]
+    title : string
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "Модуль" as Module {
+    primary_key(id) : UUID
+    --
+    title : string
+    description : string
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "Тип устройства" as DeviceType {
+    primary_key(id) : UUID
+    --
+    foreign_key(module_id) : UUID [FK к Модуль]
+    title : string
+    manufacturer : string
+    model : string
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "Устройство" as Device {
+    primary_key(id) : UUID
+    --
+    foreign_key(device_type_id) : UUID [FK к Тип устройства]
+    foreign_key(room_id) : UUID [FK к Комната]
+    serial_number : string
+    status : string
+    title : string
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "Доступ пользователя к устройству" as UserDeviceAccess {
+    foreign_key(user_id) : UUID [FK к Пользователь]
+    foreign_key(device_id) : UUID [FK к Устройство]
+    --
+    access_rights : string
+    created_at : datetime
+}
+
+entity "Данные телеметрии" as TelemetryData {
+    primary_key(id) : UUID
+    --
+    foreign_key(device_id) : UUID [FK к Устройство]
+    timestamp  : datetime
+    data : string
+    created_at : datetime
+}
+
+entity "Сценарий" as Scenario {
+    primary_key(id) : UUID
+    --
+    foreign_key(user_id) : UUID [FK к Пользователь]
+    title : string
+    description : string
+    created_at : datetime
+    updated_at : datetime
+}
+
+entity "Триггер" as Trigger {
+    primary_key(id) : UUID
+    --
+    foreign_key(scenario_id) : UUID [FK к Сценарий]
+    type : string
+    parameters : string
+}
+
+entity "Действие" as Action {
+    primary_key(id) : UUID
+    --
+    foreign_key(scenario_id) : UUID [FK к Сценарий]
+    type : string
+    parameters : string
+}
+
+entity "Событие" as Event {
+    primary_key(id) : UUID
+    --
+    foreign_key(device_id) : UUID [FK к Устройство]
+    event_type : string
+    timestamp  : datetime
+    data : string
+}
+
+entity "Команда" as Command {
+    primary_key(id) : UUID
+    --
+    foreign_key(device_id) : UUID [FK к Устройство]
+    command_type : string
+    parameters : string
+    status : string
+    created_at : datetime
+    executed_at : datetime
+}
+
+entity "Уведомление" as Notification {
+    primary_key(id) : UUID
+    --
+    foreign_key(user_id) : UUID [FK к Пользователь]
+    message : string
+    read : boolean
+    created_at : datetime
+}
+
+entity "Оповещение" as Alert {
+    primary_key(id) : UUID
+    --
+    foreign_key(device_id) : UUID [FK к Устройство]
+    alert_type : string
+    message : string
+    created_at : datetime
+    resolved_at : datetime
+}
+
+entity "Камера" as CameraDevice {
+    primary_key(id) : UUID [FK к Устройство]
+    --
+    resolution : string
+    viewing_angle : float
+    other_fields : ...
+}
+
+entity "Устройство контроля доступа" as AccessControlDevice {
+    primary_key(id) : UUID [FK к Устройство]
+    --
+    rfid_support : boolean
+    biometric_support : boolean
+    other_fields : ...
+}
+
+entity "Поток камеры" as CameraStream {
+    primary_key(id) : UUID
+    --
+    foreign_key(camera_device_id) : UUID [FK к Камера]
+    url : string
+    status : string
+}
+
+entity "Журнал доступа" as AccessLog {
+    primary_key(id) : UUID
+    --
+    foreign_key(access_device_id) : UUID [FK к Устройство контроля доступа]
+    foreign_key(user_id) : UUID [FK к Пользователь]
+    access_time : datetime
+    access_type : string
+}
+
+User ||--o{ UserRole : "имеет роли"
+Role ||--o{ UserRole : "назначается пользователям"
+
+User ||--o{ UserHouseAccess : "имеет доступ к домам"
+House ||--o{ UserHouseAccess : "доступен пользователям"
+
+House ||--o{ Room : "содержит"
+Room ||--o{ Device : "содержит"
+
+Module ||--o{ DeviceType : "включает"
+DeviceType ||--o{ Device : "используется в"
+
+User ||--o{ UserDeviceAccess : "имеет доступ к устройствам"
+Device ||--o{ UserDeviceAccess : "доступно пользователям"
+
+Device ||--o{ TelemetryData : "генерирует"
+Device ||--o{ Event : "создает"
+Device ||--o{ Command : "получает"
+Device ||--o{ Alert : "вызывает"
+
+Device ||--|{ CameraDevice : "подтип"
+Device ||--|{ AccessControlDevice : "подтип"
+
+CameraDevice ||--o{ CameraStream : "имеет поток"
+AccessControlDevice ||--o{ AccessLog : "записывает журнал"
+
+User ||--o{ Scenario : "создает"
+Scenario ||--o{ Trigger : "имеет"
+Scenario ||--o{ Action : "имеет"
+
+User ||--o{ Notification : "получает"
+
+@enduml

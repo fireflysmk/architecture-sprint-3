@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Component>
+
+title Диаграмма компонентов для Temperature Monitoring Service
+
+Container_Boundary(tempService, "Temperature Monitoring Service", $tags="") {
+    Component(tempService.APIController, "API Controller", $techn="Python Flask", $descr="Обработка API запросов")
+    Component(tempService.SensorDataCollector, "Sensor Data Collector", $techn="Python", $descr="Сбор данных с датчиков")
+    Component(tempService.DataProcessor, "Data Processor", $techn="Python", "Обработка данных")
+    Component(tempService.EventPublisher, "Event Publisher", $techn="Python", $descr="Публикация данных в Kafka")
+    Component(tempService.TelemetryDBAccess, "Telemetry DB Access", $techn="Python", $descr="Доступ к базе данных телеметрии")
+}
+
+ContainerDb(telemetryDb, "Telemetry DB", $techn="InfluxDB", $descr="Телеметрические данные")
+Container_Ext(tempSensors, "Temperature Sensors", $techn="IoT Devices", $descr="Датчики температуры")
+Container(kafka, "Kafka", $techn="Apache Kafka", $descr="Шина данных")
+
+Rel(tempService.SensorDataCollector, tempSensors, "Собирает данные с датчиков", $techn="HTTP/MQTT")
+Rel(tempService.SensorDataCollector, tempService.DataProcessor, "Передает сырые данные")
+Rel(tempService.DataProcessor, tempService.TelemetryDBAccess, "Сохраняет данные")
+Rel(tempService.TelemetryDBAccess, telemetryDb, "Читает и пишет", $techn="TCP")
+Rel(tempService.DataProcessor, tempService.EventPublisher, "Отправляет обработанные данные")
+Rel(tempService.EventPublisher, kafka, "Публикует данные", $techn="Kafka Protocol")
+Rel(tempService.APIController, tempService.TelemetryDBAccess, "Запрашивает данные")
+
+@enduml

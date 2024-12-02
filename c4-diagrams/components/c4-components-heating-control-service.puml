@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Component>
+
+title Диаграмма компонентов для Heating Control Service
+
+Container_Boundary(heatingService, "Heating Control Service", $tags="") {
+    Component(heatingService.APIController, "API Controller", $techn="Java Spring", $descr="Обработка API запросов")
+    Component(heatingService.HeatingManager, "Heating Manager", $techn="Java", $descr="Управление системами отопления")
+    Component(heatingService.DeviceCommunicator, "Device Communicator", $techn="Java", $descr="Взаимодействие с устройствами отопления")
+    Component(heatingService.EventPublisher, "Event Publisher", $techn="Java", $descr="Публикация событий в Kafka")
+    Component(heatingService.HeatingDBAccess, "Heating DB Access", $techn="Java", $descr="Доступ к базе данных отопления")
+}
+
+ContainerDb(heatingDb, "Heating DB", $techn="PostgreSQL", $descr="Настройки отопления")
+Container_Ext(heatingDevices, "Heating Devices", $techn="IoT Devices", $descr="Устройства отопления")
+Container(kafka, "Kafka", $techn="Apache Kafka", $descr="Шина данных")
+
+Rel(heatingService.APIController, heatingService.HeatingManager, "Передает команды управления отоплением")
+Rel(heatingService.HeatingManager, heatingService.DeviceCommunicator, "Отправляет команды устройствам")
+Rel(heatingService.DeviceCommunicator, heatingDevices, "Обменивается данными с устройствами", $techn="HTTP/MQTT")
+Rel(heatingService.HeatingManager, heatingService.EventPublisher, "Отправляет события")
+Rel(heatingService.EventPublisher, kafka, "Публикует события", $techn="Kafka Protocol")
+Rel(heatingService.HeatingManager, heatingService.HeatingDBAccess, "Читает и записывает настройки")
+Rel(heatingService.HeatingDBAccess, heatingDb, "Читает и пишет", $techn="JDBC")
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+!include <C4/C4>
+!include <C4/C4_Component>
+
+title Диаграмма компонентов для Lighting Control Service
+
+Container_Boundary(lightingService, "Lighting Control Service", $tags="") {
+    Component(lightingService.APIController, "API Controller", $techn="Node.js Express", $descr="Обработка API запросов")
+    Component(lightingService.LightingManager, "Lighting Manager", $techn="Node.js", $descr="Управление системами освещения")
+    Component(lightingService.DeviceCommunicator, "Device Communicator", $techn="Node.js", $descr="Взаимодействие с устройствами освещения")
+    Component(lightingService.EventPublisher, "Event Publisher", $techn="Node.js", $descr="Публикация событий в Kafka")
+    Component(lightingService.LightingDBAccess, "Lighting DB Access", $techn="Node.js", $descr="Доступ к базе данных освещения")
+}
+
+ContainerDb(lightingDb, "Lighting DB", $techn="PostgreSQL", $descr="Настройки освещения")
+Container_Ext(lightingDevices, "Lighting Devices", $techn="IoT Devices", $descr="Устройства освещения")
+Container(kafka, "Kafka", $techn="Apache Kafka", $descr="Шина данных")
+
+Rel(lightingService.APIController, lightingService.LightingManager, "Передает команды управления освещением")
+Rel(lightingService.LightingManager, lightingService.DeviceCommunicator, "Отправляет команды устройствам")
+Rel(lightingService.DeviceCommunicator, lightingDevices, "Обменивается данными с устройствами", $techn="HTTP/MQTT")
+Rel(lightingService.LightingManager, lightingService.EventPublisher, "Отправляет события")
+Rel(lightingService.EventPublisher, kafka, "Публикует события", $techn="Kafka Protocol")
+Rel(lightingService.LightingManager, lightingService.LightingDBAccess, "Читает и записывает настройки")
+Rel(lightingService.LightingDBAccess, lightingDb, "Читает и пишет", $techn="JDBC")
+
+@enduml
