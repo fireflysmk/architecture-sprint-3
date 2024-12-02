@@ -1,0 +1,72 @@
+@startuml
+title Компания "Smart Home System(ShS)⛪"
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+' Person(user, "User", "A user of the fitness club system")
+System_Boundary(dSupportUser, "Domain: Обслуживание клиентов"){
+  System(sdSupportUser, "Управление заявками на обслуживание", "Бизнес логика отдела обслуживания клиентов") 
+}
+
+System_Boundary(dSale, "Domain: Продажа оборудования SHS"){
+  System(sdPayment, "Subdomain: Оплата заказов", "Бизнес логика отдела продаж")
+  System(sdOrder, "Subdomain: Управление заказами") 
+}
+
+System_Boundary(dDevicesSmartHome, "Domain: Управление умным домом",){
+  System(sdDeviceSensor, "Subdomain: Управление датчиками")
+  System(sdDeviceControl, "Subdomain: Управление испольнительными механизмами") 
+  System(sdTelemetry, "Subdomain: Управление Телеметрией") 
+  System(sdUserData, "Subdomain: Управление данными пользователя") 
+}
+
+System_Boundary(sdcDeviceSensor, "Контекст: Управление датчиками",){
+  System(ctOnSensor, "Отключение датчика:")
+  System(ctOfSensor, "Включение датчика:") 
+  System(ctCurrentStateSensor, "Отслеживание состояния данных  датчика") 
+  System(ctAddSensor, "Добавление датчика") 
+  System(ctDeleteSensor, "Удаление датчика") 
+}
+
+System_Boundary(sdcDeviceControl, "Контекст: Управление исполнительными механизмами",){
+  System(ctOnDeviceControl, "Отключение испол механизма")
+  System(ctOfDeviceControl,, "Включение испол механизма") 
+  System(ctCurrentStateDeviceControl, "Отслеживание состояния механизма управления") 
+  System(ctAddDeviceControl, "Добавление  испол механизма") 
+  System(ctDeleteDeviceControl, "Удаление  испол механизма") 
+}
+
+System_Boundary(sdсTelemetry, "Контекст: Управление Телеметрией",){
+  System(ctOnScriptControl, "Отключение  имеющегося сценария")
+  System(ctOfScriptControl,, "Включение имеющегося сценария") 
+  System(ctCurrentStateScriptControl, "Отслеживание состояния  текущего сценария") 
+  System(ctAddScriptControl, "Добавление  сценария усправления исполнительными механизмами") 
+  System(ctDeleteScriptControl, "Удаление  сценария усправления исполнительными механизмами") 
+}
+
+System_Boundary(sdcUserData, "Контекст:  Управление данными пользователя",){
+  System(ctEditData, "Редактирование личных данных пользователя")
+}
+
+
+
+' Container_Boundary(FitLifeSystem, "FitLife System") {
+'   Container(WebApp, "Web Application", "Java, Spring", "Handles user interactions")
+'   Container(MobileApp, "Mobile Application", "Kotlin, Swift", "Allows users to manage their membership")
+'   Container(PaymentService, "Payment Service", "Node.js", "Processes payments")
+'   Container(Database, "Database", "PostgreSQL", "Stores user data and schedules")
+'   ContainerDb(Postgres,"Postgres","Техническое описние","Хранятся записи состояния датчиков", "спрайт", "tags", "links")
+' }
+
+' System_Ext(api, "Third-Party API", "External API for fitness data integration")
+' System_Ext(bank, "Bank System", "External bank for processing payments")
+
+
+'  Rel(dDevicesSmartHome, sdcSensors, "Описание контекста")
+' Rel(admin, WebApp,"Manages the system")
+' Rel(WebApp,PaymentService,"Processes payment requests")
+' Rel(PaymentService,bank,"Processes payments")
+' Rel(WebApp,Database,"Reads/Writes user data")
+' Rel(MobileApp,Database,"Reads/Writes user data")
+' Rel(WebApp,api,"Fetches fitness data")
+@enduml
