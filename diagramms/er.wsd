@@ -1,0 +1,84 @@
+@startuml
+entity "User" as user {
+    * id : Long
+    --
+    * name : String
+    * email : String
+    * password : String
+}
+
+entity "House" as house {
+    * id : Long
+    --
+    * address : String
+}
+
+entity "Device" as device {
+    * id : Long
+    --
+    * type_id : Long
+    * house_id : Long
+    * config_id : Long
+    * serial_number : String
+    * status : Enum(on, off)
+}
+
+entity "DeviceType" as deviceType {
+    * id : Long
+    --
+    * name : String
+}
+
+entity "DeviceConfig" as deviceConfig {
+    * id : Long
+    --
+    * name : String
+    * config: Json
+}
+
+
+entity "TelemetryData" as telemetryData {
+    * id : Long
+    --
+    * device_id : Long
+    * timestamp : Date
+    * analyzable_data: Long
+    * data_type: Enum
+    * extended_data : JsonString
+}
+
+
+entity "ScenarioSchedule" as scenarioSchedule {
+    * id : Long
+    --
+    * house_id : Long
+    * scenario_plan : JsonString
+    * cron: Stgring
+}
+
+entity "ScenarioScheduleDevice" as scenarioScheduleDevice {
+    * scenario_id : Long
+    * device_id : Long
+    --
+}
+
+entity "UserHouse" as userHouse {
+    * user_id : Long
+    * house_id : Long
+    --
+}
+
+house ||--o{ device : "contains"
+
+device ||--o| deviceType : "has"
+device ||--o| deviceConfig : "has"
+device ||--o{ telemetryData : "generates"
+device ||--o| scenarioScheduleDevice : "has"
+
+scenarioSchedule ||--o{ scenarioScheduleDevice : "has"
+scenarioSchedule ||--o{ house : "has"
+
+userHouse ||--o{ user : "has"
+userHouse ||--o{ house : "has"
+
+@enduml

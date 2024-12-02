@@ -1,0 +1,149 @@
+openapi: 3.0.0
+info:
+  title: Device Supervision Service API
+  version: 1.0.0
+
+paths:
+  /devices/{id}:
+    get:
+      summary: Get device information
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successfully retrieved device information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Device not found
+        '500':
+          description: Server error
+  /devices/{id}/status:
+    put:
+      summary: Update device status
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: ["on", "off"]
+      responses:
+        '200':
+          description: Device status updated successfully
+        '400':
+          description: Bad request
+        '422':
+          description: Malformed body
+        '404':
+          description: Device not found
+        '500':
+          description: Server error
+  /devices/{id}/config:
+    put:
+      summary: Create or Update device config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                config:
+                  type: object
+      responses:
+        '200':
+          description: Device config updated successfully
+        '400':
+          description: Bad request
+        '422':
+          description: Malformed body
+        '404':
+          description: "Device not found | Config not found"
+        '500':
+          description: Server error
+  /devices/{id}/config/:
+    get:
+      summary: Get device config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Device config updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          description: Bad request
+        '404':
+          description: "Device not found | Config not found"
+        '500':
+          description: Server error
+components:
+  schemas:
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+        type_id:
+          type: integer
+        house_id:
+          type: integer
+        config_id:
+          type: integer
+        serial_number:
+          type: string
+        status:
+          type: string
+          enum: ["on", "off"]
+    Config:
+      type: object
+      properties:
+        id:
+           type: integer
+        config:
+           type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  # optional, for documentation purposes only 
+      description: >-
+        Enter the token with the `Bearer: ` prefix, e.g. "Bearer abc.de1.2345".

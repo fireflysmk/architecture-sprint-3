@@ -1,0 +1,29 @@
+@startuml
+
+title Sequence Diagramm for Notirfications
+
+
+scenarioCronService --> Kafka: sends scenario events
+
+webscoketNotificationService --> Kafka: fetches messages from topics
+Kafka --> webscoketNotificationService: serving messages
+
+
+User --> WebsocketGateway: establishes connect on websocket channel/room
+WebsocketGateway --> webscoketNotificationService: proxies connect
+
+webscoketNotificationService --> WebsocketGateway: sends messages
+WebsocketGateway --> User: proxies messages to user
+
+scenarioCronService --> Kafka: sends scenario events
+
+
+webscoketNotificationService --> Kafka: fetches messages from topics
+Kafka --> webscoketNotificationService: serving messages
+
+User --> WebsocketGateway: listens to websocket channel/room
+WebsocketGateway --> webscoketNotificationService: proxies connect
+
+webscoketNotificationService --> WebsocketGateway: sends messages
+WebsocketGateway --> User: proxies messages to user
+@enduml

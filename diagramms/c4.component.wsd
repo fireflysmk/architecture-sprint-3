@@ -1,0 +1,19 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component Diagram for Device Supervision Service
+
+Container_Boundary(deviceSupervisionService, "Device Supervision Service") {
+    Component(deviceProtocolAdapter, "Device protocol adapter", "type gin.Handler", "Adapts requests with different protocols")
+    Component(deviceController, "Device Controller", "type gin.Handler", "Handles requests for /device/* routes")
+    Component(deviceService, "Device Service", "type DeviceService{}", "Contains logic for device supervision")
+    Component(deviceRepository, "Device Repository", "type DeviceRepositoyre{}", "Handles database interations for devices")
+    Component(kafkaProducer, "Kafka Producer", "type KafkaProducer{}", "Produces events to Kafka topics")
+}
+
+Rel(deviceProtocolAdapter, deviceController, "Adapts requests")
+Rel(deviceController, deviceService, "Uses")
+Rel(deviceService, deviceRepository, "Uses")
+Rel(deviceService, kafkaProducer, "Publishes events to")
+
+@enduml

@@ -1,0 +1,69 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Container Diagram for Heating Home Microservices
+
+Person(userWeb, "Web User", "A user of the webapp of the smart home system")
+Person(userMobile, "Mobile User", "A user of the mobile app of the smart home system")
+
+
+System_Boundary(SmartHomeSystem, "Heating Home System") {
+  Container(apiGateway, "API Gateway", "Selfwritten Gateway, Go gin", "Handles incoming requests and routes them to appropriate services")
+  Container(websocketGateway, "Websocket Gateway", "Nginx", "Hide the internals of websocket implementation from users, routes connections to websocket servers")
+  Container(webscoketNotificationService, "Websocket notification Service", "Go gorilla", "Websocket server with notifictions for users")
+  Container(deviceSupervisionService, "Device Supervision Service", "Go gin", "Manages device operations")
+  Container(temperatureMonitoringService, "Temperature Monitoring Service", "Go fiber", "Monitors and reports the current temperature")
+  Container(userService, "User Service", "DRF python", "Manages user information and authentication")
+  Container(scenarioManagementService, "Scenario Magment Service", "Go gin", "Rest API for the Scenario Management")
+  Container(scenarioCronService, "Scenario Management Service", "Celery python", "Launches automation scenarios on schedule")
+
+  ContainerDb(deviceDb, "Device DB", "PostgreSQL", "Stores device information")
+  ContainerDb(temperatureDb, "Temperature DB", "InfluxDB", "Stores temperature data")
+  ContainerDb(userDb, "User DB", "PostgreSQL", "Stores user information")
+  ContainerDb(notificationDb, "Notification DB", "MongoDB", "Stores notification data")
+  ContainerDb(scenarioDb, "Scenario DB", "PostgreSQL", "Works as engine for Celery and stores scenarios information")
+
+  Container(kafka, "Kafka", "Apache Kafka", "Broker for async communications")
+}
+
+Container_Ext(sensor, "External Sensor", "IoT Device", "Sends information to the smart home system", "HTTP")
+Container_Ext(yetAnotherDevice, "Yet another Device", "IoT Device", "Sends data to the system", "HTTP")
+
+
+
+Rel(userWeb, websocketGateway, "Listens to wss://", "WebSocket")
+Rel(userMobile, websocketGateway, "Listens to wss://", "WebSocket")
+
+Rel(websocketGateway, webscoketNotificationService, "Propogates wss:// connect", "WebSocket")
+Rel(webscoketNotificationService, notificationDb, "Reads from and writes to", "Mongo protocol")
+Rel(webscoketNotificationService, kafka, "Subscribes to events from", "Kafka protocol")
+
+
+Rel(userWeb, apiGateway, "Uses", "HTTP")
+Rel(userMobile, apiGateway, "Uses", "HTTP")
+
+Rel(apiGateway, deviceSupervisionService, "Routes requests to", "HTTP")
+Rel(apiGateway, temperatureMonitoringService, "Routes requests to", "HTTP")
+Rel(apiGateway, userService, "Routes requests to", "HTTP")
+Rel(apiGateway, scenarioManagementService, "Routes requests to", "HTTP")
+
+Rel(deviceSupervisionService, deviceDb, "Reads from and writes to", "Postgres protocol")
+Rel(temperatureMonitoringService, temperatureDb, "Reads from and writes to", "Influx protocol")
+Rel(userService, userDb, "Reads from and writes to", "Postgres protocol")
+Rel(scenarioManagementService, scenarioDb, "Reads from and writes to", "Postgres protocol")
+Rel(scenarioCronService, scenarioDb, "Reads scenarios from db and run it on schedule", "Postgres protocol")
+
+
+Rel(deviceSupervisionService, kafka, "Publishes events to", "Kafka protocol")
+Rel(temperatureMonitoringService, kafka, "Publishes events to", "Kafka protocol")
+Rel(scenarioManagementService, kafka, "Subscribes to events from", "Kafka protocol")
+Rel(userService, kafka, "Publishes user data changes to", "Kafka protocol")
+Rel(scenarioManagementService, kafka, "Subscribes to user data changes from", "Kafka protocol")
+Rel(scenarioCronService, kafka, "Sends scenario events", "Kafka protocol")
+
+Rel(sensor, deviceSupervisionService, "Sends data to", "HTTP")
+Rel(sensor, temperatureMonitoringService, "Sends temperature data to", "HTTP")
+Rel(yetAnotherDevice, deviceSupervisionService, "Sends data to", "HTTP")
+
+
+@enduml
