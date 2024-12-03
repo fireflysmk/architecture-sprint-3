@@ -8,10 +8,10 @@ LAYOUT_WITH_LEGEND()
 Person(user, "Клиент", "Пользователь системы умного дома")
 Person(admin, "Администратор", "Администратор системы умного дома")
 
-System_Boundary(home, "Дом") {
-System_Ext(device, "Устройство", "Устройство системы умного дома")
-System_Ext(sensor, "Датчик", "Датчик системы умного дома")
-System(hub, "Gateway умного дома", "Хаб для устройств и датчиков")
+Boundary(home, "Дом") {
+    System_Ext(device, "Устройство", "Устройство системы умного дома")
+    System_Ext(sensor, "Датчик", "Датчик системы умного дома")
+    System(hub, "Gateway умного дома", "Хаб для устройств и датчиков")
 }
 
 Container(web, "Web приложение", "React", "Регистрация новых устройств, изменение параметров устройств, просмотр параметров телеметрии")
@@ -22,15 +22,15 @@ System_Boundary(system, "Сервер") {
     Container(users, "Микросервис управления клиентами", "Python")
     Container(devices, "Микросервис управления устройствами", "Python")
     Container(telemetry, "Микросервис управления телеметрией", "Python")
-    Container(gateway, "API Gateway", "Kong")
+    Container(gateway, "API Gateway", "Kong", "Обработка и маршрутизация запросов")
     ContainerDb(db_users, "База данных для Микросервиса Клиентов", "PostgreSQL")
     ContainerDb(db_devices, "База данных для Микросервиса Устройств", "PostgreSQL")
     ContainerDb(db_telemetry, "База данных для Микросервиса телеметрии", "PostgreSQL")
 }
 
-Rel(users, db_users, "Reads from and write to")
-Rel(devices, db_devices, "Reads from and write to")
-Rel(telemetry, db_telemetry, "Reads from and write to")
+Rel(users, db_users, "Запись \ Чтение данных", "SQL \ TCP")
+Rel(devices, db_devices, "Запись \ Чтение данных" , "SQL \ TCP")
+Rel(telemetry, db_telemetry, "Запись \ Чтение данных" , "SQL \ TCP")
 
 Rel(user, web, "Использует систему")
 Rel(user, mobileApp, "Использует систему")
