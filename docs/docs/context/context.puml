@@ -1,0 +1,14 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Клиент", "Пользователь системы умного дома")
+Container(server, "Сервер", "Java", "Управляет отоплением и взаимодействует с датчиками температуры в помещении")
+
+System_Ext(system, "Отопительное оборудование", "Heating System")
+System_Ext(sensor, "Температурный датчик", "Temperature Sensor")
+
+Rel(user, server, "Включение \ отключения отопления")
+Rel(server, system, "Управление отоплением")
+Rel(server, sensor, "Данные с температурных датчиков")
+
+@enduml
