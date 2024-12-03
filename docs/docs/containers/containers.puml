@@ -21,7 +21,7 @@ Container(webAdmin, "Web приложение администора", "React", 
 System_Boundary(system, "Сервер") {
     Container(users, "Микросервис управления клиентами", "Python")
     Container(devices, "Микросервис управления устройствами", "Python")
-    Container(telemetry, "Микросервис управления телеметрией", "Python")
+    Container(telemetry, "Микросервис телеметрии", "Python")
     Container(gateway, "API Gateway", "Kong", "Обработка и маршрутизация запросов")
     ContainerDb(db_users, "База данных для Микросервиса Клиентов", "PostgreSQL")
     ContainerDb(db_devices, "База данных для Микросервиса Устройств", "PostgreSQL")
