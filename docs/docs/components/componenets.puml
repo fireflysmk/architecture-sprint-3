@@ -1,0 +1,23 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Клиент", "Клиент системы умного дома")
+
+Container(gateway, "API Gateway")
+
+Container_Boundary(users, "Микросервис управления клиентами") {
+    Component(httpController, "Контроллер для входящих запросов", "", "Обрабатывает HTTP запросы для пользователя, дома и связей устройств с домом")
+    Component(clientController, "Контроллер по управлению данными пользователя", "", "Добавляет пользователей, дома и привязывает устройства к дому")
+
+    Rel(httpController, clientController, "Вызов методов")
+}
+
+ContainerDb(db_users, "Data Base для устройств", "PostgreSQL", "Хранит данные пользователя, дома")
+
+Rel(user, gateway, "Просмотр и изменение данных", "Просмотр и изменение данных пользователя, дома")
+
+Rel(gateway, httpController, "Маршрутизация")
+
+Rel(clientController, db_clients, "Сохранение данных пользователя")
+
+@enduml
