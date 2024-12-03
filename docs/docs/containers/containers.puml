@@ -7,15 +7,22 @@ LAYOUT_WITH_LEGEND()
 
 Person(user, "Клиент", "Пользователь системы умного дома")
 Person(admin, "Администратор", "Администратор системы умного дома")
+
+System_Boundary(home, "Дом") {
 System_Ext(device, "Устройство", "Устройство системы умного дома")
 System_Ext(sensor, "Датчик", "Датчик системы умного дома")
-System_Ext(sensor, "Gateway умного дома", "Хаб для устройств и дат")
+System(hub, "Gateway умного дома", "Хаб для устройств и датчиков")
+}
 
-System_Boundary(system, "Сервер", "Позволяет управлять устройствами пользователям и собирать с них информацию") {
+Container(web, "Web приложение", "React", "Регистрация новых устройств, изменение параметров устройств, просмотр параметров телеметрии")
+Container(mobileApp, "Мобильное приложение", "Flutter", "Регистрация новых устройств, изменение параметров устройств, просмотр параметров телеметрии")
+Container(webAdmin, "Web приложение администора", "React", "Управление пользователями, ролями, устройствами, датчиками")
+
+System_Boundary(system, "Сервер") {
     Container(users, "Микросервис управления клиентами", "Python")
     Container(devices, "Микросервис управления устройствами", "Python")
     Container(telemetry, "Микросервис управления телеметрией", "Python")
-    Container(gateway, "API Gateway")
+    Container(gateway, "API Gateway", "Kong")
     ContainerDb(db_users, "База данных для Микросервиса Клиентов", "PostgreSQL")
     ContainerDb(db_devices, "База данных для Микросервиса Устройств", "PostgreSQL")
     ContainerDb(db_telemetry, "База данных для Микросервиса телеметрии", "PostgreSQL")
@@ -25,14 +32,21 @@ Rel(users, db_users, "Reads from and write to")
 Rel(devices, db_devices, "Reads from and write to")
 Rel(telemetry, db_telemetry, "Reads from and write to")
 
-Rel(user, gateway, "Управление системой умного дома", "Регистрация новых устройств, изменение параметров устройств, просмотр параметров телеметрии")
-Rel(admin, gateway, "Управление системой умного дома", "Управление пользователями, ролями, устройствами, датчиками")
+Rel(user, web, "Использует систему")
+Rel(user, mobileApp, "Использует систему")
+Rel(admin, webAdmin, "Использует систему")
+
+Rel(web, gateway, "Взаимодействует с системой", "HTTPS, JSON")
+Rel(mobileApp, gateway, "Взаимодействует с системой", "HTTPS, JSON")
+Rel(webAdmin, gateway, "Взаимодействует с системой", "HTTPS, JSON")
 
 Rel(gateway, users, "Просмотр профиля, изменение профиля")
 Rel(gateway, devices, "Просмотр устройств, изменение параметров устройства, добавление новых устройств")
 Rel(gateway, telemetry, "Просмотр параметров телеметрии")
 
-Rel(device, gateway, "Обновление параметров", "Передача показаний датчиков, запрос параметров устройств")
-Rel(sensor, gateway, "Обновление параметров и передача показаний", "Передача показаний датчиков, запрос параметров устройств")
+Rel(hub, device, "Обновление параметров")
+Rel(sensor, hub, "Передача показаний")
+Rel(hub, gateway, "Взаимодействует с системой", "HTTPS, JSON")
+
 
 @enduml

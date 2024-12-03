@@ -1,13 +1,19 @@
 @startuml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
+skinparam wrapWidth 300
+LAYOUT_WITH_LEGEND()
+
 Person(user, "Клиент", "Пользователь системы умного дома")
-Container(server, "Сервер", "Java", "Управляет отоплением и взаимодействует с датчиками температуры в помещении")
+Person(admin, "Администратор", "Администратор системы умного дома")
+Container(server, "Сервер", "Java", "Управляет отоплением и взаимодействует с датчиками температуры в помещении, управление профилями клиентов")
 
 System_Ext(system, "Отопительное оборудование", "Heating System")
 System_Ext(sensor, "Температурный датчик", "Temperature Sensor")
 
 Rel(user, server, "Включение \ отключения отопления")
+Rel(admin, server, "Добавление оборудование, добавление \ изменение профилей клиентов")
+
 Rel(server, system, "Управление отоплением")
 Rel(server, sensor, "Данные с температурных датчиков")
 
