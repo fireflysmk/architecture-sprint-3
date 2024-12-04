@@ -1,0 +1,27 @@
+@startuml
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+skinparam wrapWidth 300
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Пользователь системы", "Взаимодействует с системой через мобильное приложение или веб интерфейс")
+
+System_Boundary(clients, "Микросервис по управлению данными клиента", "Python") {
+    Container(gateway, "API Gateway", "Kong", "Маршрутизация запросов")
+
+    Container(users, "Микросервис управления клиентами", "Python", "Управляет профилями клиента") {
+        Component(userController, "Контроллер", "Python Flask", "Обрабатывает запросы на изменение профилей клиентов")
+        Component(userDBLayer, "Компонент взаимодействия с БД", "Python", "Взаимодействует с базой данных")
+    }
+    ContainerDb(db_users, "База данных для Микросервиса Клиентов", "PostgreSQL")
+}
+
+Rel(user, gateway, "Использует систему")
+
+Rel(gateway, userController, "Взаимодействует с контроллером")
+Rel(userController, userDBLayer, "Использует для операций над данными профиля клиента")
+Rel(userDBLayer, db_users, "Запись \ Чтение данных", "SQL \ TCP")
+
+
+@enduml

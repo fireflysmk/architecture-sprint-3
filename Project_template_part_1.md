@@ -58,9 +58,10 @@
 
 Чтобы добавить ссылку в файл Readme.md, нужно использовать синтаксис Markdown. Это делают так:
 
-```markdown
+
 [Визуализация контекста](./docs/docs/context/context.puml)
-```
+
+![image](./docs/images/context.png)
 
 # Задание 2. Проектирование микросервисной архитектуры
 
@@ -68,20 +69,27 @@
 
 
 **Диаграмма контейнеров (Containers)**
-```markdown
+
 [Диаграмма контейнеров (Containers)](./docs/docs/containers/containers.puml)
-```
+
+![image](./docs/images/containers.png)
+
 **Диаграмма компонентов (Components)**
-```markdown
-[Диаграмма компонентов (Components)](./docs/docs/components/components.puml)
-```
+
+[Диаграмма компонента клиентов (Components)](./docs/docs/components/component_client.puml)
+
+[Диаграмма компонента устройств (Components)](./docs/docs/components/component_devices.puml)
+
+[Диаграмма компонента телеметрии (Components)](./docs/docs/components/component_telemetry.puml)
+
 **Диаграмма кода (Code)**
-```markdown
+
 [Диаграмма кода (Code)](./docs/docs/code/code.puml)
-```
+
 # Задание 3. Разработка ER-диаграммы
 
 Добавьте сюда ER-диаграмму. Она должна отражать ключевые сущности системы, их атрибуты и тип связей между ними.
-```markdown
+
 [ER-диаграммы](./docs/docs/er/er.puml)
-```
+
+![image](./docs/images/er.png)
