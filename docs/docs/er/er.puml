@@ -1,0 +1,67 @@
+@startuml
+
+entity "Пользователь" as User {
+    * id : UUID
+    --
+    name : String
+    email : String
+    password : String
+    created_at : Date
+}
+
+entity "Роли пользователей" as UserRole {
+    * id : UUID
+    --
+    user_id : UUID
+    role_id: UIID
+}
+
+entity "Роль" as Role {
+    * id : UUID
+    --
+    name : String
+    permission: String
+}
+
+entity "Дом " as House {
+    * id : UUID
+    --
+    user_id : UUID
+    address : String
+    name : String
+    created_at : Date
+}
+
+entity "Устройство" as Device {
+    * id : UUID
+    --
+    type_id : UUID
+    house_id : UUID
+    status : String
+    data : String
+}
+
+entity "Тип Устройство" as DeviceType {
+    * id : UUID
+    --
+    name : String
+    type : String
+}
+
+entity "Телеметрия" as TelemetryData {
+    * id : UUID
+    --
+    device_id : UUID
+    timestamp : DateTime
+    data : String
+}
+
+User ||--|{UserRole
+Role ||--|{ UserRole
+
+User ||--o{ House
+House ||--o{ Device
+Device ||--|| DeviceType
+Device ||--o{ TelemetryData
+
+@enduml
