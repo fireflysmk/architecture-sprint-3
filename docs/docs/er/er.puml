@@ -14,6 +14,7 @@ entity "Роли пользователей" as UserRole {
     --
     user_id : UUID
     role_id: UIID
+    house_id_id: UIID
 }
 
 entity "Роль" as Role {
@@ -30,6 +31,13 @@ entity "Дом " as House {
     address : String
     name : String
     created_at : Date
+}
+
+entity "Модуль " as Module {
+    * id : UUID
+    --
+    house_id : UUID
+    name : String
 }
 
 entity "Устройство" as Device {
@@ -53,14 +61,16 @@ entity "Телеметрия" as TelemetryData {
     --
     device_id : UUID
     timestamp : DateTime
-    data : String
+    value : String
 }
 
 User ||--|{UserRole
 Role ||--|{ UserRole
+House ||--|{UserRole
 
 User ||--o{ House
-House ||--o{ Device
+House ||--o{ Module
+Module ||--o{ Device
 Device ||--|| DeviceType
 Device ||--o{ TelemetryData
 
