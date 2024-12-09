@@ -1,0 +1,63 @@
+@startuml
+title Smart Home Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "A user of the fitness club system")
+System(SmartHomeSystem, "Smart Home", "System managing memberships, schedules, and payments")
+
+Container_Boundary(SmartHomeSystem, "Smart Home") {
+  Container(WebApp, "Web Application", "Java, Spring", "Веб-приложение")
+  Container(Kafka, "Message broker", "Kafka", "Брокер сообщений")
+
+  Container_Boundary(Heating, "Heating"){
+    Container(HeatService, "Сервис: Управление отоплением", "Включение, выключение, контроль температуры")
+    Container(HeatDatabase, "Heating Database", "PostgreSQL", "Хранения данных отопительных приборов")
+  }
+
+  Container_Boundary(Telemetry, "Telemetry"){
+    Container(HeatMonitoring, "Сервис: Мониторинг температуры", "Мониторинг температуры")
+    Container(TelemetryDatabase, "Telemetry Database", "PostgreSQL", "Хранение данных температурных датчиков")
+  }
+
+  Container_Boundary(Doors, "Doors"){
+    Container(DoorsService, "Сервис: управление воротами", "Открытие, закрытие ворот")
+    Container(DoorsDatabase, "Doors Database", "PostgreSQL", "Хранение данных ворот")
+  }
+
+  Container_Boundary(Light, "Light"){
+    Container(LightService, "Сервис: управление освещением", "Вкключение, выключение осветительных приборов")
+    Container(LightDatabase, "Light Database", "PostgreSQL", "Хранение данных освещения")
+  }
+
+  Container_Boundary(Video, "Video"){
+    Container(VideoService, "Сервис: видеонаблюдение", "видеосъека объектов наблюдения")
+    Container(VideoDatabase, "Video Database", "PostgreSQL", "Хранение данных видеонаблюдения")
+  }
+
+
+}
+
+Rel(user, WebApp, "Uses the system")
+Rel(WebApp, Kafka,"")
+Rel(Kafka, WebApp, "")
+
+Rel(HeatService, Kafka,"")
+Rel(Kafka,HeatDatabase,"")
+
+Rel(HeatMonitoring, Kafka,"")
+Rel(Kafka,TelemetryDatabase,"")
+
+Rel(DoorsService, Kafka,"")
+Rel(Kafka,DoorsDatabase,"")
+
+Rel(LightService, Kafka,"")
+Rel(Kafka,LightDatabase,"")
+
+Rel(VideoService, Kafka,"")
+Rel(Kafka,VideoDatabase,"")
+
+
+@enduml
