@@ -1,0 +1,18 @@
+@startuml
+title Component Diagram: Device Management Service
+
+package "Device Management Service" {
+    component "Device API" as DeviceAPI
+    component "Command Processor" as CommandProcessor
+    component "Device State Manager" as StateManager
+    component "Event Publisher" as EventPublisher
+    database "PostgreSQL (Device DB)" as DeviceDB
+}
+
+DeviceAPI --> CommandProcessor : Handle Requests
+CommandProcessor --> StateManager : Update State
+StateManager --> DeviceDB : Store Device Data
+StateManager --> EventPublisher : Notify Changes
+EventPublisher --> Kafka : Publish Events
+
+@enduml

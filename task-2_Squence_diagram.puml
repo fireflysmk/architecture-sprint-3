@@ -1,0 +1,18 @@
+@startuml
+title Sequence Diagram: Publish Event to Kafka in Device Management Service
+
+actor User
+participant "DeviceController" as Controller
+participant "DeviceService" as Service
+participant "DeviceRepository" as Repository
+participant "KafkaProducer" as Producer
+
+User -> Controller: POST /devices
+Controller -> Service: addDevice(deviceDetails)
+Service -> Repository: save(deviceEntity)
+Repository --> Service: deviceEntity (saved)
+Service -> Producer: publishEvent("DEVICE_ADDED", deviceEntity)
+Producer --> Kafka: Send Event
+Service --> Controller: Response: Success
+
+@enduml

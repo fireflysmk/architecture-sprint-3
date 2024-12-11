@@ -1,0 +1,19 @@
+```plantuml
+@startuml
+title Context Diagram: Monolit App "Warm Home"
+
+actor "User" as User
+actor "TechSupport" as TechSupport
+
+package "Warm Home" {
+    [Heating Management]
+    [Temperature Monitoring]
+}
+
+User --> [Heating Management] : Manage Heating
+User --> [Temperature Monitoring] : View Temperature
+TechSupport --> [Warm Home] : Install/Configure Devices
+[Warm Home] --> (Sensor) : Request Data
+(Sensor) --> [Warm Home] : Send Temperature Data
+
+@enduml
