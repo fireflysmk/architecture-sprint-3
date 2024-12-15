@@ -34,9 +34,19 @@ entity "TelemetryData" {
     * status : String
 }
 
+entity "AutomationScenario" {
+    * id : UUID
+    * user_id : UUID
+    * name : String
+    * description : String
+    * conditions : String
+    * actions : String
+}
+
 ' Relationships
 User ||--o{ House : "owns"
 House ||--o{ Device : "has"
 Device ||--|| DeviceType : "is of type"
 Device ||--o{ TelemetryData : "generates"
+User ||--o{ AutomationScenario : "creates"
 @enduml

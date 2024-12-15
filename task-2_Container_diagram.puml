@@ -15,6 +15,7 @@ node "Cloud" {
         [Monitoring Service]
         [Notification Service]
         [User Management Service]
+        [Automation Service]
     }
     queue "Kafka" as Kafka
     database "PostgreSQL (Device DB)" as DeviceDB
@@ -23,10 +24,20 @@ node "Cloud" {
     database "PostgreSQL (Monitoring DB)" as MonitoringDB
     database "PostgreSQL (Notification DB)" as NotificationDB
     database "PostgreSQL (User DB)" as UserDB
+    database "PostgreSQL (Automation DB)" as AutomationDB
 }
 
-User --> [API Gateway] : Use System
+package "Client Applications" {
+    [Web Interface]
+    [Mobile App]
+}
+
+User --> [Web Interface] : Access via Web
+User --> [Mobile App] : Access via Mobile
 TechSupport --> [API Gateway] : Configure Devices
+
+[Web Interface] --> [API Gateway] : HTTP Requests
+[Mobile App] --> [API Gateway] : HTTP Requests
 
 [API Gateway] --> [Device Management Service] : Manage Devices
 [API Gateway] --> [Heating Service] : Manage Heating
@@ -34,6 +45,7 @@ TechSupport --> [API Gateway] : Configure Devices
 [API Gateway] --> [Monitoring Service] : Collect Data
 [API Gateway] --> [Notification Service] : Send Notifications
 [API Gateway] --> [User Management Service] : Manage Users
+[API Gateway] --> [Automation Service] : Manage Automation
 
 [Device Management Service] --> DeviceDB : Read/Write
 [Heating Service] --> HeatingDB : Read/Write
@@ -41,12 +53,14 @@ TechSupport --> [API Gateway] : Configure Devices
 [Monitoring Service] --> MonitoringDB : Read/Write Telemetry
 [Notification Service] --> NotificationDB : Read/Write
 [User Management Service] --> UserDB : Read/Write
+[Automation Service] --> AutomationDB : Read/Write
 
 [Device Management Service] --> Kafka : Publish Events
 [Heating Service] --> Kafka : Publish/Consume Events
 [Lighting Service] --> Kafka : Publish/Consume Events
 [Monitoring Service] --> Kafka : Publish/Consume Telemetry
 [Notification Service] --> Kafka : Consume Events
+[Automation Service] --> Kafka : Publish/Consume Automation Events
 
 (Sensors) --> [Monitoring Service] : Send Data
 [Notification Service] --> User : Notify User
