@@ -1,0 +1,52 @@
+@startuml
+title Class Diagram: Device Management Service
+
+class DeviceController {
+    - deviceService: DeviceService
+    + addDevice(request: DeviceRequest): ResponseEntity<String>
+}
+
+class DeviceService {
+    - deviceRepository: DeviceRepository
+    - kafkaProducer: KafkaProducer
+    + addDevice(request: DeviceRequest): void
+}
+
+class DeviceRepository {
+    + save(device: DeviceEntity): DeviceEntity
+    + findById(id: Long): Optional<DeviceEntity>
+}
+
+class KafkaProducer {
+    - kafkaTemplate: KafkaTemplate<String, Object>
+    + publishEvent(eventType: String, payload: Object): void
+}
+
+class DeviceEntity {
+    - id: Long
+    - name: String
+    - type: String
+    + getId(): Long
+    + setId(id: Long): void
+    + getName(): String
+    + setName(name: String): void
+    + getType(): String
+    + setType(type: String): void
+}
+
+class DeviceRequest {
+    - name: String
+    - type: String
+    + getName(): String
+    + setName(name: String): void
+    + getType(): String
+    + setType(type: String): void
+}
+
+DeviceController --> DeviceService : "uses"
+DeviceService --> DeviceRepository : "uses"
+DeviceService --> KafkaProducer : "uses"
+DeviceRepository --> DeviceEntity : "manages"
+KafkaProducer --> KafkaTemplate : "publishes"
+DeviceController --> DeviceRequest : "receives"
+@enduml

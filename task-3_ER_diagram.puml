@@ -1,0 +1,52 @@
+@startuml
+entity "User" {
+    * id : UUID
+    * name : String
+    * email : String
+    * password_hash : String
+}
+
+entity "House" {
+    * id : UUID
+    * address : String
+    * user_id : UUID
+}
+
+entity "Device" {
+    * id : UUID
+    * type_id : UUID
+    * house_id : UUID
+    * serial_number : String
+    * status : String
+}
+
+entity "DeviceType" {
+    * id : UUID
+    * name : String
+    * description : String
+}
+
+entity "TelemetryData" {
+    * id : UUID
+    * device_id : UUID
+    * timestamp : DateTime
+    * temperature : Float
+    * status : String
+}
+
+entity "AutomationScenario" {
+    * id : UUID
+    * user_id : UUID
+    * name : String
+    * description : String
+    * conditions : String
+    * actions : String
+}
+
+' Relationships
+User ||--o{ House : "owns"
+House ||--o{ Device : "has"
+Device ||--|| DeviceType : "is of type"
+Device ||--o{ TelemetryData : "generates"
+User ||--o{ AutomationScenario : "creates"
+@enduml

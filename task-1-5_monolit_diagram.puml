@@ -1,0 +1,38 @@
+@startuml
+title Context Diagram: Monolit App "Warm Home"
+
+actor "User" as User
+actor "TechSupport" as TechSupport
+
+package "Warm Home" {
+    [Heating Management]
+    [Temperature Monitoring]
+    [Scenario and Automation]
+    [House Management]
+}
+
+package "Client Applications" {
+    [Web Interface]
+    [Mobile App]
+}
+
+User --> [Web Interface] : Access via Web (HTTP/HTTPS)
+User --> [Mobile App] : Access via Mobile (HTTP/HTTPS)
+
+[Web Interface] --> [Heating Management] : Manage Heating (HTTP)
+[Mobile App] --> [Heating Management] : Manage Heating (HTTP)
+
+[Web Interface] --> [Temperature Monitoring] : View Temperature (HTTP)
+[Mobile App] --> [Temperature Monitoring] : View Temperature (HTTP)
+
+[Web Interface] --> [Scenario and Automation] : Manage Scenarios (HTTP)
+[Mobile App] --> [Scenario and Automation] : Manage Scenarios (HTTP)
+
+[Web Interface] --> [House Management] : Manage House (HTTP)
+[Mobile App] --> [House Management] : Manage House (HTTP)
+
+TechSupport --> [Warm Home] : Install/Configure Devices
+[Warm Home] --> (Sensor) : Request Data
+(Sensor) --> [Warm Home] : Send Temperature Data
+
+@enduml
